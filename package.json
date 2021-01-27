@@ -1,0 +1,22 @@
+{
+  "name": "horny_bot",
+  "version": "0.0.1",
+  "description": "Discord bot to automatically jail horny rumles",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/cpebble/horny_bot.git"
+  },
+  "author": "@cp#8080",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cpebble/horny_bot/issues"
+  },
+  "homepage": "https://github.com/cpebble/horny_bot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1"
+  }
+}
