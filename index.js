@@ -93,7 +93,7 @@ async function markUser(user, member, roleCfg){
         let jailCfg = {"id": id, "username": username, "timestamp": Date.now(), "freedom": Date.now()+roleCfg.timeout, "role": roleCfg.roleid}
         jail.push(jailCfg)
         member.roles.add(roleObj);
-        console.log(`Jailed ${username}`)
+        console.log(`Jailed ${username} with ${roleCfg.name}`)
     });
 }
 
