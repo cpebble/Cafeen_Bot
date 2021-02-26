@@ -160,7 +160,7 @@ dc.on("message", message=>{
         activeGuild = message.guild;
     }
     if (message.content.startsWith("$")){
-        let cmd = message.content.substring(4)
+        let cmd = message.content.substring(1)
         console.log(`Got command: ${cmd}`);
         handleCommandMessage(message, cmd);
     } else {
