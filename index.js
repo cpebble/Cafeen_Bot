@@ -15,7 +15,7 @@ const filter = (reaction, user) =>{
     return reaction.emoji.name.startsWith("bonk");
 }
 let hornyLimit = 5;
-let collectorOptions = {time: 10*60*1000, max: 1};
+let collectorOptions = {time: 60*60*1000, max: 32};
 let collectors = [];
 let config = undefined;
 let activeGuild = undefined;
@@ -45,12 +45,22 @@ function loadJailFile(){
     })
 }
 loadJailFile();
+let scoreboard = {};
+function loadScoreboardFile(){
+    fs.readFile('scoreboard.json', (err, data)=>{
+        if (err) throw err;
+        scoreboard = JSON.parse(data);
+        console.log("Loaded Scoreboard File");
+    })
+}
+loadScoreboardFile();
 
 // Save the config file
 function exitHandler(options, exitCode){
     if (options.cleanup){
         fs.writeFileSync("config.json", JSON.stringify(config));
         fs.writeFileSync("jail.json", JSON.stringify(jail));
+        fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
     } 
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit){
@@ -78,6 +88,7 @@ and will now be released`);
 }, 5000);
 
 async function letUserOut(jailed){
+    if (activeGuild == undefined) return;
     let id = jailed.id;
     let member = await activeGuild.members.fetch(id);
     let role = jailed.role; // To ensure promise is fulfilled
@@ -97,15 +108,64 @@ async function markUser(user, member, roleCfg){
     });
 }
 
+function onReactScoreboard(reaction, user){
+    console.log("HERE");
+    let emoji = reaction.emoji.name.toLowerCase();
+    if (emoji in scoreboard){
+        let member = reaction["message"]["member"];
+        let id = member.id;
+        let username = member.nickname;
+        if (id in scoreboard[emoji]){
+            scoreboard[emoji][id]["score"] += 1;
+        }
+        else{
+            scoreboard[emoji][id] = {
+                "username": username,
+                "score": 1
+            }
+        }
+        console.log(`User ${username} now has emoji ${emoji} score ${scoreboard[emoji][id]["score"]}`)
+    }
+}
+
+function generateScoreboard(){
+    let output = "Cafeens Scoreboard \n";
+    for (let emoji in scoreboard){
+        output += `**${emoji}**\n`
+        // convert dict to array
+        var sortable = [];
+        for (let user in scoreboard[emoji]) {
+            sortable.push([user, scoreboard[emoji][user]]);
+        }
+        let scores = sortable.sort((a, b)=>{
+            return b[1].score - a[1].score
+        });
+        for (let i = 0; i < scores.length; i++){
+            output += `${scores[i][1]["username"]}: ${scores[i][1]["score"]}\n`
+        }
+        output += "###############################\n"
+    }
+    return output;
+}
+
+
+function handleCommandMessage (message, cmd){
+    let response = handleCommand(cmd);
+    message.channel.send(response);
+}
+
 // Listeners
 dc.on("message", message=>{
     if (activeGuild == undefined){
         activeGuild = message.guild;
     }
     if (message.content.startsWith("8=D")){
-        console.log(`Got command: ${message.content}`);
-        // TODO: Expand
+        let cmd = message.content.substring(4)
+        console.log(`Got command: ${cmd}`);
+        handleCommandMessage(message, cmd);
     } else {
+
+        message.createReactionCollector(()=>true, collectorOptions).on("collect", onReactScoreboard);
         config.roles.forEach(role=>{
             let filter = (reaction, user) =>{
                 return reaction.emoji.name == (role.emoji);
@@ -126,6 +186,7 @@ dc.on("message", message=>{
     }
 });
 
+
 // This handles input from either cli or bot dm
 function handleCommand(cmd){
     switch (cmd){
@@ -139,6 +200,9 @@ function handleCommand(cmd){
             break;
         case 'exit':
             process.exit();
+        case 'score':
+            // Generate scoreboard
+            return generateScoreboard();
         default:
             return `Unrecognized command "${cmd}"`;
 
