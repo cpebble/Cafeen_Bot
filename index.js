@@ -159,7 +159,7 @@ dc.on("message", message=>{
     if (activeGuild == undefined){
         activeGuild = message.guild;
     }
-    if (message.content.startsWith("8=D")){
+    if (message.content.startsWith("$")){
         let cmd = message.content.substring(4)
         console.log(`Got command: ${cmd}`);
         handleCommandMessage(message, cmd);
