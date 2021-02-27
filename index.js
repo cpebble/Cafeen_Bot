@@ -16,7 +16,7 @@ const filter = (reaction, user) =>{
 }
 let hornyLimit = 5;
 let collectorOptions = {time: 60*60*1000, max: 1};
-let scoreboardCollectorOptions = {time: 60*60*1000, max: 1};
+let scoreboardCollectorOptions = {time: 24*60*60*1000, max: 1};
 let collectors = [];
 let config = undefined;
 let activeGuild = undefined;
@@ -199,11 +199,28 @@ function handleCommand(cmd){
             loadJailFile();
             return "Reload jail started";
             break;
+        case 'save_scores':
+            fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
+            return "Saved score file"
+            break;
+        case 'github':
+            return 'https://github.com/cpebble/Cafeen_Bot'
+            break;
         case 'exit':
             process.exit();
+            break;
         case 'score':
             // Generate scoreboard
             return generateScoreboard();
+        case 'help':
+            return `
+**Commands:**
+\`score\`: List scoreboard
+\`save_scores\`: Save scores to file(debug)
+\`github\`: View source code
+\`help\`: This list
+\`reload_jail\`: Mostly for if people are stuck in a specific role
+            `
         default:
             return `Unrecognized command "${cmd}"`;
 
