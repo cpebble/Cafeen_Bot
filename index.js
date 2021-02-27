@@ -117,7 +117,7 @@ function onReactScoreboard(reaction, user){
         let id = member.id;
         let username = member.nickname;
         if (username === null){
-            username = user.username;
+            username = member.user.username;
         }
         if (id in scoreboard[emoji]){
             scoreboard[emoji][id]["score"] += 1;
