@@ -199,6 +199,10 @@ function handleCommand(cmd){
             loadJailFile();
             return "Reload jail started";
             break;
+        case 'reload_scores':
+            loadScoreboardFile();
+            return "Reload jail started";
+            break;
         case 'save_scores':
             fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
             return "Saved score file"
