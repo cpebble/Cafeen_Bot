@@ -15,7 +15,7 @@ const filter = (reaction, user) =>{
     return reaction.emoji.name.startsWith("bonk");
 }
 let hornyLimit = 5;
-let collectorOptions = {time: 60*60*1000, max: 1};
+let collectorOptions = {time: 60*60*1000, max: 32};
 let scoreboardCollectorOptions = {time: 24*60*60*1000, max: 1};
 let collectors = [];
 let config = undefined;
@@ -116,6 +116,9 @@ function onReactScoreboard(reaction, user){
         let member = reaction["message"]["member"];
         let id = member.id;
         let username = member.nickname;
+        if (username === null){
+            username = user.username;
+        }
         if (id in scoreboard[emoji]){
             scoreboard[emoji][id]["score"] += 1;
         }
@@ -201,7 +204,7 @@ function handleCommand(cmd){
             break;
         case 'reload_scores':
             loadScoreboardFile();
-            return "Reload jail started";
+            return "Reload scores started";
             break;
         case 'save_scores':
             fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
