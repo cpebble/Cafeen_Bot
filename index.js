@@ -70,7 +70,7 @@ function exitHandler(options, exitCode){
     } 
 }
 
-setInterval(()=>{ // Jailed clean-up
+function jailCleanup(){
     let toRemove = [];
     for(let i = 0; i < jail.length; i++){
         // Check if they should be let out of jail
@@ -86,7 +86,9 @@ and will now be released`);
     for(let i = 0; i < toRemove.length; i++){
         jail.splice(toRemove[i], 1);
     }
-}, 5000);
+}
+
+setInterval(jailCleanup, 5000);
 
 async function letUserOut(jailed){
     if (activeGuild == undefined) return;
@@ -144,7 +146,7 @@ function generateScoreboard(){
         let scores = sortable.sort((a, b)=>{
             return b[1].score - a[1].score
         });
-        for (let i = 0; i < scores.length; i++){
+        for (let i = 0; i < Math.min(scores.length, 5); i++){
             output += `${scores[i][1]["username"]}: ${scores[i][1]["score"]}\n`
         }
         output += "###############################\n"
@@ -193,13 +195,15 @@ dc.on("message", message=>{
 
 // This handles input from either cli or bot dm
 function handleCommand(cmd){
-    switch (cmd){
+    let cmdArg = cmd.split(" ")
+    switch (cmdArg[0]){
         case 'reload_conf':
             loadConfigFile();
             return "Reload conf started";
             break;
         case 'reload_jail':
             loadJailFile();
+            jailCleanup();
             return "Reload jail started";
             break;
         case 'reload_scores':
