@@ -55,7 +55,7 @@ function loadScoreboardFile(){
     })
 }
 loadScoreboardFile();
-let quotes = {};
+let quotes = [];
 function loadQuoteFile(){
     fs.readFile('quotes.json', (err, data)=>{
         if (err) throw err;
@@ -244,7 +244,7 @@ function handleCommand(cmd){
         case 'citat':
             if (cmdArg.length > 2){
                 let quotee = cmdArg[1];
-                let quote = cmdArg.splice[2].join(" ");
+                let quote = cmdArg.splice(2).join(" ");
                 quotes.push([quotee, quote, Date.now()]);
                 return "Det er noteret";
             } else {
