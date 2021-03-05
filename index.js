@@ -55,6 +55,15 @@ function loadScoreboardFile(){
     })
 }
 loadScoreboardFile();
+let quotes = {};
+function loadQuoteFile(){
+    fs.readFile('quotes.json', (err, data)=>{
+        if (err) throw err;
+        quotes = JSON.parse(data);
+        console.log("Loaded quotes File");
+    });
+}
+loadQuoteFile();
 
 // Save the config file
 function exitHandler(options, exitCode){
@@ -192,6 +201,15 @@ dc.on("message", message=>{
     }
 });
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+function getRandomQuote(){
+    let i = getRandomInt(quotes.length);
+    let q = quotes[i];
+    return `${q[0]} sagde "${q[1]}" det herrens år ${q[2]}`;
+}
 
 // This handles input from either cli or bot dm
 function handleCommand(cmd){
@@ -223,6 +241,15 @@ function handleCommand(cmd){
         case 'score':
             // Generate scoreboard
             return generateScoreboard();
+        case 'citat':
+            if (cmdArg.length > 2){
+                let quotee = cmdArg[1];
+                let quote = cmdArg.splice[2].join(" ");
+                quotes.push([quotee, quote, Date.now()]);
+                return "Det er noteret";
+            } else {
+                return getRandomQuote();
+            }
         case 'help':
             return `
 **Commands:**
