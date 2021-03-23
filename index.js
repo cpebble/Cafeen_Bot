@@ -71,6 +71,7 @@ function exitHandler(options, exitCode){
         fs.writeFileSync("config.json", JSON.stringify(config));
         fs.writeFileSync("jail.json", JSON.stringify(jail));
         fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
+        fs.writeFileSync("quotes.json", JSON.stringify(quotes));
     } 
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit){
