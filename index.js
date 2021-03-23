@@ -204,11 +204,25 @@ dc.on("message", message=>{
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-
+let months = [
+    "Januar",
+    "Februar",
+    "Marts",
+    "April",
+    "Maj",
+    "Juni",
+    "Juli",
+    "August",
+    "September",
+    "Oktober",
+    "November",
+    "December"
+]
 function getRandomQuote(){
     let i = getRandomInt(quotes.length);
     let q = quotes[i];
-    return `${q[0]} sagde "${q[1]}" det herrens år ${q[2]}`;
+    let timestamp = new Date(q[2]);
+    return `${q[0]} sagde "${q[1]}" \nDet herrens år ${timestamp.getUTCFullYear()}, sådan omkring ${months[timestamp.getMonth()]}`;
 }
 
 // This handles input from either cli or bot dm
