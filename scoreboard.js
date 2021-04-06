@@ -1,4 +1,5 @@
 const utils = require("./utils");
+const fs = require("fs")
 
 // Env vars
 let scoreboardCollectorOptions = { time: 24 * 60 * 60 * 1000, max: 32 };
@@ -29,12 +30,6 @@ function onReactScoreboard(reaction, user){
     }
 }
 
-async function init(dc, config) {
-    scoreboard = await utils.loadJsonFile("scoreboard");
-    dc.on("message", message => {
-        message.createReactionCollector(() => true, scoreboardCollectorOptions).on("collect", onReactScoreboard);
-    })
-}
 
 function saveScores(){
     fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
@@ -60,4 +55,16 @@ function generateScoreboard(){
     return output;
 }
 
-module.exports = { "init": init, "saveScores": saveScores, "generateScoreboard": generateScoreboard }
+async function init(dc, config) {
+    scoreboard = await utils.loadJsonFile("scoreboard");
+    dc.on("message", message => {
+        message.createReactionCollector(() => true, scoreboardCollectorOptions).on("collect", onReactScoreboard);
+    })
+}
+async function destroy(dc, config){
+
+    fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
+}
+
+
+module.exports = { "init": init, "destroy": destroy, "saveScores": saveScores, "generateScoreboard": generateScoreboard }

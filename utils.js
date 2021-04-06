@@ -6,4 +6,9 @@ async function loadJsonFile(filename){
     return ret;
 }
 
-module.exports = {loadJsonFile}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+module.exports = {"loadJsonFile": loadJsonFile, "getRandomInt": getRandomInt}

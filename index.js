@@ -1,9 +1,9 @@
 // Libs
 const Discord = require("discord.js");
-const dc = new Discord.Client();
-const secrets = require("./secrets.json");
 const fs = require("fs");
 const readline = require("readline");
+const dc = new Discord.Client();
+const secrets = require("./secrets.json");
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -30,29 +30,15 @@ function loadJailFile(){
         console.log("Loaded Jail File");
     })
 }
-let scoreboard = {};
-utils.loadJsonFile("scoreboard")
-.then((data)=>
-    scoreboard = data
-)
 loadJailFile();
-let quotes = [];
-function loadQuoteFile(){
-    fs.readFile('quotes.json', (err, data)=>{
-        if (err) throw err;
-        quotes = JSON.parse(data);
-        console.log("Loaded quotes File");
-    });
-}
-loadQuoteFile();
 
 // Save the config file
 function exitHandler(options, exitCode){
     if (options.cleanup){
         fs.writeFileSync("config.json", JSON.stringify(config));
         fs.writeFileSync("jail.json", JSON.stringify(jail));
-        fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
-        fs.writeFileSync("quotes.json", JSON.stringify(quotes));
+        Scoreboard.destroy(dc, config);
+        Quotes.destroy(dc, config);
     } 
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit){
@@ -112,7 +98,7 @@ dc.on("message", message=>{
     if (activeGuild == undefined){
         activeGuild = message.guild;
     }
-    if (message.content.startsWith("^")){
+    if (message.content.startsWith(config.command_char)){
         let cmd = message.content.substring(1)
         console.log(`Got command: ${cmd}`);
         handleCommandMessage(message, cmd);
@@ -137,29 +123,6 @@ dc.on("message", message=>{
     }
 });
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
-}
-let months = [
-    "Januar",
-    "Februar",
-    "Marts",
-    "April",
-    "Maj",
-    "Juni",
-    "Juli",
-    "August",
-    "September",
-    "Oktober",
-    "November",
-    "December"
-]
-function getRandomQuote(){
-    let i = getRandomInt(quotes.length);
-    let q = quotes[i];
-    let timestamp = new Date(q[2]);
-    return `${q[0]} sagde "${q[1]}" \nDet herrens år ${timestamp.getUTCFullYear()}, sådan omkring ${months[timestamp.getMonth()]}`;
-}
 
 // This handles input from either cli or bot dm
 function handleCommand(cmd){
@@ -190,15 +153,6 @@ function handleCommand(cmd){
         case 'score':
             // Generate scoreboard
             return Scoreboard.generateScoreboard();
-        case 'citat':
-            if (cmdArg.length > 2){
-                let quotee = cmdArg[1];
-                let quote = cmdArg.splice(2).join(" ");
-                quotes.push([quotee, quote, Date.now()]);
-                return "Det er noteret";
-            } else {
-                return getRandomQuote();
-            }
         case 'help':
             return `
 **Commands:**
@@ -248,11 +202,15 @@ dc.once("ready", ()=>{
 async function init(){
 // Load the config file
     activeGuild = undefined;
-    await RegisterModules()
+    await RegisterModules();
 }
 
 // Module loading
-const Scoreboard = require("./scoreboard")
+const Scoreboard = require("./scoreboard");
+const Quotes     = require("./quotes");
 async function RegisterModules(){
-    await Scoreboard.init(dc, config)
+    // Gather promises
+    let sP = Scoreboard.init(dc, config);
+    let qP = Quotes.init(dc,config);
+    await Promise.all([sP, qP]);
 }
