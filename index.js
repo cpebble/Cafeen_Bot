@@ -11,81 +11,23 @@ const rl = readline.createInterface({
 });
 const utils = require("./utils.js");
 
-// Env Vars
-const filter = (reaction, user) =>{
-    return reaction.emoji.name.startsWith("bonk");
-}
-let hornyLimit = 5;
-let collectorOptions = {time: 60*60*1000, max: 1};
-let collectors = [];
 let config = undefined;
 let activeGuild = undefined;
 
-// Init code
-let jail = {};
-function loadJailFile(){
-    fs.readFile('jail.json', (err, data)=>{
-        if (err) throw err;
-        jail = JSON.parse(data);
-        console.log("Loaded Jail File");
-    })
-}
-loadJailFile();
-
-// Save the config file
+// Exit cleanly
 function exitHandler(options, exitCode){
     if (options.cleanup){
+        // Destroy modules
         fs.writeFileSync("config.json", JSON.stringify(config));
-        fs.writeFileSync("jail.json", JSON.stringify(jail));
         Scoreboard.destroy(dc, config);
         Quotes.destroy(dc, config);
+        Jail.destroy(dc, config);
     } 
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit){
         console.log("Exit cleanly");
         process.exit();
     } 
-}
-
-function jailCleanup(){
-    let toRemove = [];
-    for(let i = 0; i < jail.length; i++){
-        // Check if they should be let out of jail
-        let dT = Date.now();
-        if (dT > jail[i].freedom) {
-            console.log(`User ${jail[i].username} has been jailed for ${dT / 1000} seconds, \
-and will now be released`);
-            toRemove.push(i);
-            letUserOut(jail[i]);
-        }
-    }
-    toRemove = toRemove.reverse();
-    for(let i = 0; i < toRemove.length; i++){
-        jail.splice(toRemove[i], 1);
-    }
-}
-
-setInterval(jailCleanup, 5000);
-
-async function letUserOut(jailed){
-    if (activeGuild == undefined) return;
-    let id = jailed.id;
-    let member = await activeGuild.members.fetch(id);
-    let role = jailed.role; // To ensure promise is fulfilled
-    let roleObj = await activeGuild.roles.fetch(role);
-    console.log(`Letting out ${id} with member: ${member}`);
-    member.roles.remove(roleObj);
-}
-
-async function markUser(user, member, roleCfg){
-    let id = user.id;
-    let username = user.username;
-    member.guild.roles.fetch(roleCfg.roleid).then((roleObj)=>{
-        let jailCfg = {"id": id, "username": username, "timestamp": Date.now(), "freedom": Date.now()+roleCfg.timeout, "role": roleCfg.roleid}
-        jail.push(jailCfg)
-        member.roles.add(roleObj);
-        console.log(`Jailed ${username} with ${roleCfg.name}`)
-    });
 }
 
 function handleCommandMessage (message, cmd){
@@ -103,23 +45,7 @@ dc.on("message", message=>{
         console.log(`Got command: ${cmd}`);
         handleCommandMessage(message, cmd);
     } else {
-        config.roles.forEach(role=>{
-            let filter = (reaction, user) =>{
-                return reaction.emoji.name == (role.emoji);
-            }
-            let collector = message.createReactionCollector(filter, collectorOptions);
-            collector.on("end", (collected, reaction)=>{
-                if (reaction === "limit"){
-                    console.log("Finished collecting bonks");
-                    // Ban this Bonk
-                    let user = collected.first()["message"]["author"];
-                    let member = collected.first()["message"]["member"];
-                    markUser(user, member, role);
-                }
-                
-            });
-            collectors.push(collector);
-        });
+        // I guess do nothing
     }
 });
 
@@ -128,18 +54,18 @@ dc.on("message", message=>{
 function handleCommand(cmd){
     let cmdArg = cmd.split(" ")
     switch (cmdArg[0]){
-        case 'reload_conf':
-            loadConfigFile();
-            return "Reload conf started";
-            break;
-        case 'reload_jail':
-            loadJailFile();
-            jailCleanup();
-            return "Reload jail started";
-            break;
-        case 'reload_scores':
-            return "Reload scores broken";
-            break;
+        // case 'reload_conf':
+        //     loadConfigFile();
+        //     return "Reload conf started";
+        //     break;
+        // case 'reload_jail':
+        //     loadJailFile();
+        //     jailCleanup();
+        //     return "Reload jail started";
+        //     break;
+        // case 'reload_scores':
+        //     return "Reload scores broken";
+        //     break;
         case 'save_scores':
             Scoreboard.saveScores()
             return "Saved score file"
@@ -208,9 +134,12 @@ async function init(){
 // Module loading
 const Scoreboard = require("./scoreboard");
 const Quotes     = require("./quotes");
+const Jail       = require("./jail");
+
 async function RegisterModules(){
     // Gather promises
     let sP = Scoreboard.init(dc, config);
     let qP = Quotes.init(dc,config);
-    await Promise.all([sP, qP]);
+    let jP = Jail.init(dc, config);
+    await Promise.all([sP, qP, jP]);
 }
