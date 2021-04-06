@@ -9,6 +9,7 @@ const rl = readline.createInterface({
     output: process.stdout,
     prompt: ">>"
 });
+const utils = require("./utils.js");
 
 // Env Vars
 const filter = (reaction, user) =>{
@@ -16,27 +17,11 @@ const filter = (reaction, user) =>{
 }
 let hornyLimit = 5;
 let collectorOptions = {time: 60*60*1000, max: 1};
-let scoreboardCollectorOptions = {time: 24*60*60*1000, max: 32};
 let collectors = [];
 let config = undefined;
 let activeGuild = undefined;
 
 // Init code
-dc.once("ready", ()=>{
-    console.log("ready");
-    dc.user.setActivity('Your conversations', { type: 'LISTENING' });
-});
-// Load the config file
-function loadConfigFile(){
-    fs.readFile('config.json', (err, data)=>{
-        if (err) throw err;
-        config = JSON.parse(data);
-        console.log("Loaded Config File");
-        console.log(config);
-        activeGuild = undefined;
-    })
-}
-loadConfigFile();
 let jail = {};
 function loadJailFile(){
     fs.readFile('jail.json', (err, data)=>{
@@ -45,16 +30,12 @@ function loadJailFile(){
         console.log("Loaded Jail File");
     })
 }
-loadJailFile();
 let scoreboard = {};
-function loadScoreboardFile(){
-    fs.readFile('scoreboard.json', (err, data)=>{
-        if (err) throw err;
-        scoreboard = JSON.parse(data);
-        console.log("Loaded Scoreboard File");
-    })
-}
-loadScoreboardFile();
+utils.loadJsonFile("scoreboard")
+.then((data)=>
+    scoreboard = data
+)
+loadJailFile();
 let quotes = [];
 function loadQuoteFile(){
     fs.readFile('quotes.json', (err, data)=>{
@@ -121,50 +102,6 @@ async function markUser(user, member, roleCfg){
     });
 }
 
-function onReactScoreboard(reaction, user){
-    console.log("HERE");
-    let emoji = reaction.emoji.name.toLowerCase();
-    if (emoji in scoreboard){
-        let member = reaction["message"]["member"];
-        let id = member.id;
-        let username = member.nickname;
-        if (username === null){
-            username = member.user.username;
-        }
-        if (id in scoreboard[emoji]){
-            scoreboard[emoji][id]["score"] += 1;
-        }
-        else{
-            scoreboard[emoji][id] = {
-                "username": username,
-                "score": 1
-            }
-        }
-        console.log(`User ${username} now has emoji ${emoji} score ${scoreboard[emoji][id]["score"]}`)
-    }
-}
-
-function generateScoreboard(){
-    let output = "Cafeens Scoreboard \n";
-    for (let emoji in scoreboard){
-        output += `**${emoji}**\n`
-        // convert dict to array
-        var sortable = [];
-        for (let user in scoreboard[emoji]) {
-            sortable.push([user, scoreboard[emoji][user]]);
-        }
-        let scores = sortable.sort((a, b)=>{
-            return b[1].score - a[1].score
-        });
-        for (let i = 0; i < Math.min(scores.length, 5); i++){
-            output += `${scores[i][1]["username"]}: ${scores[i][1]["score"]}\n`
-        }
-        output += "###############################\n"
-    }
-    return output;
-}
-
-
 function handleCommandMessage (message, cmd){
     let response = handleCommand(cmd);
     message.channel.send(response);
@@ -175,13 +112,11 @@ dc.on("message", message=>{
     if (activeGuild == undefined){
         activeGuild = message.guild;
     }
-    if (message.content.startsWith("$")){
+    if (message.content.startsWith("^")){
         let cmd = message.content.substring(1)
         console.log(`Got command: ${cmd}`);
         handleCommandMessage(message, cmd);
     } else {
-
-        message.createReactionCollector(()=>true, scoreboardCollectorOptions).on("collect", onReactScoreboard);
         config.roles.forEach(role=>{
             let filter = (reaction, user) =>{
                 return reaction.emoji.name == (role.emoji);
@@ -240,11 +175,10 @@ function handleCommand(cmd){
             return "Reload jail started";
             break;
         case 'reload_scores':
-            loadScoreboardFile();
-            return "Reload scores started";
+            return "Reload scores broken";
             break;
         case 'save_scores':
-            fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
+            Scoreboard.saveScores()
             return "Saved score file"
             break;
         case 'github':
@@ -255,7 +189,7 @@ function handleCommand(cmd){
             break;
         case 'score':
             // Generate scoreboard
-            return generateScoreboard();
+            return Scoreboard.generateScoreboard();
         case 'citat':
             if (cmdArg.length > 2){
                 let quotee = cmdArg[1];
@@ -301,3 +235,24 @@ process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
 
 //catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+
+utils.loadJsonFile("config").then(data=>config = data)
+
+dc.once("ready", ()=>{
+    console.log("Discord ready");
+    dc.user.setActivity('Your conversations', { type: 'LISTENING' });
+    init().then(()=>{
+        console.log("Main init() reported done");
+    })
+});
+async function init(){
+// Load the config file
+    activeGuild = undefined;
+    await RegisterModules()
+}
+
+// Module loading
+const Scoreboard = require("./scoreboard")
+async function RegisterModules(){
+    await Scoreboard.init(dc, config)
+}
