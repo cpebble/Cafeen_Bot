@@ -12,7 +12,6 @@ const rl = readline.createInterface({
 const utils = require("./utils.js");
 
 let config = undefined;
-let activeGuild = undefined;
 
 // Exit cleanly
 function exitHandler(options, exitCode){
@@ -37,9 +36,6 @@ function handleCommandMessage (message, cmd){
 
 // Listeners
 dc.on("message", message=>{
-    if (activeGuild == undefined){
-        activeGuild = message.guild;
-    }
     if (message.content.startsWith(config.command_char)){
         let cmd = message.content.substring(1)
         console.log(`Got command: ${cmd}`);
@@ -127,7 +123,6 @@ dc.once("ready", ()=>{
 });
 async function init(){
 // Load the config file
-    activeGuild = undefined;
     await RegisterModules();
 }
 

@@ -2,6 +2,7 @@ const utils = require("./utils");
 let jail = {};
 let collectorOptions = {time: 60*60*1000, max: 1};
 let collectors = [];
+let activeGuild;
 
 // Set users role
 async function markUser(user, member, roleCfg){
@@ -54,6 +55,10 @@ async function init(dc, config){
     setInterval(jailCleanup, 5000);
     // Set up message listener
     dc.on("message", (message)=>{
+        // This should be better
+        if (activeGuild == undefined){
+            activeGuild = message.guild;
+        }
         config.roles.forEach(role=>{
             let filter = (reaction, user) =>{
                 return reaction.emoji.name == (role.emoji);
