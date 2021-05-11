@@ -48,11 +48,13 @@ and will now be released`);
     }
 }
 
-async function init(dc, config){
+async function init(app, dc, config){
     // load jail file
     jail = await utils.loadJsonFile("jail");
     // Check for cleanups
     setInterval(jailCleanup, 5000);
+    // init acG
+    activeGuild = app["active_guild"];
     // Set up message listener
     dc.on("message", (message)=>{
         // This should be better

@@ -15,64 +15,53 @@ const utils = require("./utils.js");
 let config = undefined;
 
 
-function handleCommandMessage(message, cmd) {
-    let response = handleCommand(cmd);
-    message.channel.send(response);
-}
-
 // Listeners
 dc.on("message", message => {
     if (message.content.startsWith(config.command_char)) {
         let cmd = message.content.substring(1)
         console.log(`Got command: ${cmd}`);
-        handleCommandMessage(message, cmd);
+        try {
+            let response = handleCommand(message, cmd);
+            if (response != "") // Edge-case recovery
+                message.channel.send(response);
+        } catch (error) {
+            console.log("Error:");
+            console.warn(error);
+        }
     } else {
         // I guess do nothing
     }
 });
 
-// This handles input from either cli or bot dm
-function handleCommand(cmd) {
-    let cmdArg = cmd.split(" ")
-    switch (cmdArg[0]) {
-        // case 'reload_conf':
-        //     loadConfigFile();
-        //     return "Reload conf started";
-        //     break;
-        // case 'reload_jail':
-        //     loadJailFile();
-        //     jailCleanup();
-        //     return "Reload jail started";
-        //     break;
-        // case 'reload_scores':
-        //     return "Reload scores broken";
-        //     break;
-        case 'save_scores':
-            Scoreboard.saveScores()
-            return "Saved score file"
-            break;
-        case 'github':
-            return 'https://github.com/cpebble/Cafeen_Bot'
-            break;
-        case 'exit':
-            process.exit();
-            break;
-        case 'score':
-            // Generate scoreboard
-            return Scoreboard.generateScoreboard();
-        case 'help':
-            return `
-**Commands:**
-\`score\`: List scoreboard
-\`save_scores\`: Save scores to file(debug)
-\`github\`: View source code
-\`help\`: This list
-\`reload_jail\`: Mostly for if people are stuck in a specific role
-            `
-        default:
-            return `Unrecognized command "${cmd}"`;
+let app = {
+    "commands": {
+        "save_scores": ((msg,cmd)=>{
+            Scoreboard.saveScores();
+            return "Save_scores started"
+        }),
+        "github": ((msg,cmd)=>{
+            return "https://github.com/cpebble/cafeen_bot"
+        })
+    },
+    "active_guild": "nyi"
 
+
+}
+// This handles input from either cli or bot dm
+function handleCommand(msg, cmd) {
+    let cmdArg = cmd.split(" ")
+    // Switch statements are sooo 1987
+    let cmdfun = app.commands[cmdArg[0]] 
+    let response;
+    if (cmdfun != undefined)
+    {
+        response = cmdfun(msg, cmd)
     }
+    else
+    {
+        response = "OwO you typed an oopsie woopsie";
+    }
+    return response;
 }
 
 // Start the bot server
@@ -135,9 +124,9 @@ const Jail = require("./jail");
 // Async load func
 async function RegisterModules() {
     // Gather promises
-    let sP = Scoreboard.init(dc, config);
-    let qP = Quotes.init(dc, config);
-    let jP = Jail.init(dc, config);
+    let sP = Scoreboard.init(app, dc, config);
+    let qP = Quotes.init(app, dc, config);
+    let jP = Jail.init(app, dc, config);
     // Load async
     await Promise.all([sP, qP, jP]);
 }

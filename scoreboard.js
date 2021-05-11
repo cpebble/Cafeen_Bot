@@ -8,7 +8,6 @@ let scoreboardCollectorOptions = { time: 24 * 60 * 60 * 1000, max: 32 };
 let scoreboard = {};
 
 function onReactScoreboard(reaction, user){
-    console.log("HERE");
     let emoji = reaction.emoji.name.toLowerCase();
     if (emoji in scoreboard){
         let member = reaction["message"]["member"];
@@ -55,8 +54,12 @@ function generateScoreboard(){
     return output;
 }
 
-async function init(dc, config) {
+async function init(app, dc, config) {
     scoreboard = await utils.loadJsonFile("scoreboard");
+    // Register command function
+    utils.registerCommandFun(app, "score", (msg,cmd)=>{
+        return generateScoreboard();
+    })
     dc.on("message", message => {
         message.createReactionCollector(() => true, scoreboardCollectorOptions).on("collect", onReactScoreboard);
     })
