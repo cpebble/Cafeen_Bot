@@ -48,6 +48,23 @@ and will now be released`);
     }
 }
 
+function unJailAll(msg, cmd){
+    if(msg.author.id != "333007839637536771")
+        return "Only 4 good boys";
+    
+    let toRemove = [];
+    for(let i = 0; i < jail.length; i++){
+        letUserOut(jail[i]);
+        toRemove.push(i);
+    }
+    toRemove = toRemove.reverse();
+    for(let i = 0; i < toRemove.length; i++){
+        // Weird splice hack since objects are unsorted
+        jail.splice(toRemove[i], 1);
+    }
+    return "Release the people"
+}
+
 async function init(app, dc, config){
     // load jail file
     jail = await utils.loadJsonFile("jail");
@@ -55,6 +72,9 @@ async function init(app, dc, config){
     setInterval(jailCleanup, 5000);
     // init acG
     activeGuild = app["active_guild"];
+
+    utils.registerCommandFun(app, "unlock_jail", unJailAll);
+
     // Set up message listener
     dc.on("message", (message)=>{
         // This should be better
