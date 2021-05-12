@@ -1,18 +1,29 @@
+const { getMessageLink } = require("./utils");
 const utils = require("./utils");
+const fs = require("fs")
 let jail = {};
 let collectorOptions = {time: 60*60*1000, max: 1};
 let collectors = [];
 let activeGuild = undefined;
 
 // Set users role
-async function markUser(user, member, roleCfg){
+async function markUser(user, member, message, roleCfg){
     let id = user.id;
     let username = user.username;
+    let messagelink = getMessageLink(message);
     member.guild.roles.fetch(roleCfg.roleid).then((roleObj)=>{
-        let jailCfg = {"id": id, "username": username, "timestamp": Date.now(), "freedom": Date.now()+roleCfg.timeout, "role": roleCfg.roleid}
+        let jailCfg = {
+            "id": id,
+            "username": username,
+            "emoji": roleCfg.emoji,
+            "timestamp": Date.now(),
+            "freedom": Date.now()+roleCfg.timeout,
+            "role": roleCfg.roleid,
+            "messagelink": messagelink
+        }
         jail.push(jailCfg)
         member.roles.add(roleObj);
-        console.log(`Jailed ${username} with ${roleCfg.name}`)
+        console.log(`Jailed ${username} with ${roleCfg.name}[${messagelink}]`)
     });
 }
 // Proc for removing role
@@ -24,6 +35,52 @@ async function letUserOut(jailed){
     let roleObj = await activeGuild.roles.fetch(role);
     console.log(`Letting out ${id} with member: ${member}`);
     member.roles.remove(roleObj);
+}
+
+const whyFlavorText = [
+    "du har været så vovet at skrive",
+    "Natasha kedede sig",
+    "således skrev Jon Sporring",
+    "Thea kedede sig",
+    "Påbøl er en unfair botmager",
+    "Arinrinrin kørte dig over i sin lastbil",
+    "din mor ringede til os og bad os pænt",
+    "du gav consent til veganske vampyre",
+    "du lod rus styre musikken",
+    "discord ikke ville lade dig skrive",
+    "jeg siger det",
+    "jeg blev offended af det her",
+    "jeg blev triggered af det her",
+    "det her virker som fysiker-propaganda",
+    "ingen syntes det her var sjovt"
+]
+function why(message, cmd){
+    let userId = message.author.id;
+    // Get a list of jail sentences
+    let sentences = jail.filter(sent=> sent.id == userId);
+    let sentenceFieldArr = sentences.map(sent=>{
+        let r = message.guild.roles.cache.get(sent.role);
+        let i = utils.getRandomInt(whyFlavorText.length);
+        let flavortxt = whyFlavorText[i];
+        return {
+            "name": `${r.name}`,
+            "value": `Du har fået :${sent.emoji}: fordi [${flavortxt}](${sent.messagelink})`
+        }
+    });
+    // Early exit
+    if (sentenceFieldArr.length == 0){
+        return "Du 100p clean af"
+    }
+
+    let retval = sentenceFieldArr.join("\n")
+    let embed = {
+        "title": "Du ved jo godt hvorfor",
+        "description": "*Ifølge mine noter har du følgende domme*",
+        "color": 3207707,
+        "fields": sentenceFieldArr,
+    }
+    message.channel.send("", {embed})
+    return "";
 }
 
 // Check if any roles should be removed
@@ -75,6 +132,7 @@ async function init(app, dc, config){
     //activeGuild = app["active_guild"];
 
     utils.registerCommandFun(app, "unlock_jail", unJailAll);
+    utils.registerCommandFun(app, "why", why);
 
     // Set up message listener
     dc.on("message", (message)=>{
@@ -93,7 +151,7 @@ async function init(app, dc, config){
                     // Ban this Bonk
                     let user = collected.first()["message"]["author"];
                     let member = collected.first()["message"]["member"];
-                    markUser(user, member, role);
+                    markUser(user, member, message, role);
                 }
                 
             });
@@ -103,7 +161,12 @@ async function init(app, dc, config){
 
 }
 async function destroy(dc, config){
-    fs.writeFileSync("jail.json", JSON.stringify(jail));
+    let f = JSON.stringify(jail);
+    try {
+        console.log(fs.writeFileSync("jail.json", f));
+    } catch (error) {
+        console.log(error)
+    }
 }
 module.exports = {
     "init": init,
