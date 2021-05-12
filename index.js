@@ -13,6 +13,7 @@ const utils = require("./utils.js");
 
 // Config init
 let config = undefined;
+let uptime = undefined;
 
 
 // Listeners
@@ -41,6 +42,9 @@ let app = {
         }),
         "github": ((msg,cmd)=>{
             return "https://github.com/cpebble/cafeen_bot"
+        }),
+        "uptime": ((msg, cmd)=>{
+            return utils.timeSince(uptime);
         })
     },
     "active_guild": "nyi"
@@ -109,6 +113,7 @@ dc.once("ready", () => {
     })
 });
 async function init() {
+    uptime = Date.now();
     // Load the config file
     await RegisterModules();
 }
