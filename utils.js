@@ -16,6 +16,16 @@ function registerCommandFun(app, fname, fun) {
   app.commands[fname] = fun;
 }
 
+function getMessageLink(message){
+  let gid = message.guild.id;
+  let cid = message.channel.id;
+  let mid = message.id;
+
+  let l = `https://discord.com/channels/${gid}/${cid}/${mid}`
+  return l;
+
+}
+
 function timeSince(date) {
 
   var seconds = Math.floor((new Date() - date) / 1000);
@@ -48,5 +58,6 @@ module.exports = {
   "loadJsonFile": loadJsonFile,
   "getRandomInt": getRandomInt,
   "registerCommandFun": registerCommandFun,
-  "timeSince": timeSince
+  "timeSince": timeSince,
+  "getMessageLink": getMessageLink
 }
