@@ -2,7 +2,7 @@ const utils = require("./utils");
 let jail = {};
 let collectorOptions = {time: 60*60*1000, max: 1};
 let collectors = [];
-let activeGuild;
+let activeGuild = undefined;
 
 // Set users role
 async function markUser(user, member, roleCfg){
@@ -71,7 +71,8 @@ async function init(app, dc, config){
     // Check for cleanups
     setInterval(jailCleanup, 5000);
     // init acG
-    activeGuild = app["active_guild"];
+    // Bad
+    //activeGuild = app["active_guild"];
 
     utils.registerCommandFun(app, "unlock_jail", unJailAll);
 
