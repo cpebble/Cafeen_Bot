@@ -1,5 +1,5 @@
 {
-  "name": "horny_bot",
+  "name": "Cafeen_bot",
   "version": "0.0.1",
   "description": "Discord bot to automatically jail horny rumles",
   "main": "index.js",
@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/cpebble/horny_bot#readme",
   "dependencies": {
-    "discord.js": "^12.5.1"
+    "discord.js": "^12.5.1",
+    "express": "^4.17.1",
+    "socket.io": "^4.1.1"
   }
 }

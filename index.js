@@ -1,6 +1,17 @@
 // Libs
 const Discord = require("discord.js");
 const fs = require("fs");
+// Setup express baseline app
+const Express = require("express")
+const express_app = Express();
+const http = require("http");
+const express_server = http.createServer(express_app);
+express_app.use(Express.static("site"));
+// Setup socket.io baseline app
+const { Server } = require("socket.io");
+const io = new Server(express_server);
+
+// Discord stuffs
 const readline = require("readline");
 const dc = new Discord.Client();
 const secrets = require("./secrets.json");
@@ -47,9 +58,9 @@ let app = {
             return utils.timeSince(uptime);
         })
     },
-    "active_guild": "nyi"
-
-
+    "active_guild": "nyi",
+    "express_app": express_app,
+    "io": io
 }
 // This handles input from either cli or bot dm
 function handleCommand(msg, cmd) {
@@ -112,6 +123,11 @@ dc.once("ready", () => {
         console.log("Main init() reported done");
     })
 });
+// Startup webserver
+express_server.listen(3000, ()=>{
+    "Web server loaded"
+});
+
 async function init() {
     uptime = Date.now();
     // Load the config file
