@@ -94,3 +94,4 @@ function handleScoreIncrease_old(scoreObj) {
 }
 
 socket.on("scoreboard", drawScoreBoard);
+socket.on("score", handleScoreIncrease);
