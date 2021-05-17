@@ -1,9 +1,10 @@
-
+let defaultTab = "upyolo";
 
 // This supports changing memory views
 function changeTab(ev){
     let tabs = document.querySelectorAll(".tab")
     let tab = `${ev.target.dataset.tab}_tab`;
+    defaultTab = ev.target.dataset.tab
     for(let i = 0; i < tabs.length; i++){
         let el = tabs[i];
         if (el.id != tab){

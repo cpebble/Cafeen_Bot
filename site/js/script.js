@@ -1,7 +1,6 @@
 var socket = io();
 let scoreboardEl = document.getElementById("scoreboard-container");
 let tabEl = document.getElementById("tabs_panel");
-let defaultTab = "upyolo";
 
 function addEmojiTab(emoji){
     // Create the container
