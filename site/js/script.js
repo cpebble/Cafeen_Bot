@@ -25,7 +25,9 @@ function addEmojiTab(emoji){
 
 }
 
+let ScoreboardCache;
 function drawScoreBoard(scoreboard){
+    ScoreboardCache = scoreboard;
     scoreboardEl.innerHTML = "";
     tabEl.innerHTML = "";
     // Loop over and create a tab for every score
@@ -64,19 +66,31 @@ function drawScoreBoard(scoreboard){
     }
 }
 
-
-function handleScoreIncrease(scoreObj) {
-    // Recieves Object { uid: "333007839637536771", emoji: "upyolo" }
-    let table = document.querySelectorAll(`table[data-emoji="${scoreObj.emoji}"] > tr`) // For shure hackish
-    let rows = [...table].filter((el) => {
-        return el.dataset.userId == scoreObj.uid
-    });
-    console.log(row);
-    if (rows.length == 0) {
-        // TODO: Handle
+function handleScoreIncrease(scoreObj){
+    if (ScoreboardCache[scoreObj.emoji][scoreObj.uid] == undefined)
         return;
-    }
-    let row = rows[0];
+    ScoreboardCache[scoreObj.emoji][scoreObj.uid]["score"] += 1;
+    drawScoreBoard(ScoreboardCache);
+}
+
+function handleScoreIncrease_old(scoreObj) {
+    // Recieves Object { uid: "333007839637536771", emoji: "upyolo" }
+    // Get the correcct row
+    // let table = document.querySelectorAll(`table[data-emoji="${scoreObj.emoji}"] > tr`) // For shure hackish
+    // let rows = [...table].filter((el) => {
+    //     return el.dataset.userId == scoreObj.uid
+    // });
+    // if (rows.length == 0) {
+    //     // TODO: Handle
+    //     return;
+    // }
+    // let row = rows[0];
+    // let score = parseInt(row.dataset.score);
+    // let nscore = score + 1;
+    // row.dataset.score = nscore;
+
+    // row.childNodes[2].textContent = nscore;
+    // console.log(row);
 }
 
 socket.on("scoreboard", drawScoreBoard);
