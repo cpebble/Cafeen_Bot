@@ -32,16 +32,18 @@ function drawScoreBoard(scoreboard){
     // Loop over and create a tab for every score
     for(let emoji in scoreboard){
         let tab = addEmojiTab(emoji);
-        let title = document.createElement("h2");
-        title.textContent = emoji + " Scores"
-        tab.appendChild(title);
+        let title = document.createElement("tr");
+        title.innerHTML = `
+            <th><h2>${emoji} Scores</h2></th><th></th>
+        `
+        // title.textContent = emoji + " Scores"
+        //tab.appendChild(title);
 
         let scoreTable = document.createElement("table");
-        scoreTable.innerHTML = `
-        <tr>
-            <th>Username</th><th>Score</th>
-        </tr>
-        `
+        scoreTable.appendChild(title);
+        let h3 = document.createElement("tr")
+        h3.innerHTML = `<th>Username</th><th>Score</th>`;
+        scoreTable.appendChild(h3);
         scoreTable.dataset.emoji = emoji;
         let sortable = [];
         for (let uid in scoreboard[emoji])

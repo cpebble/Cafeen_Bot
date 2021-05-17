@@ -1,6 +1,10 @@
 #tabs_panel {
 	/* border: 2px solid black; */
 	padding: 1em 0 0;
+	display:flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 0.5em;
 }
 
 #tabs_panel .tab_button {
@@ -11,7 +15,8 @@
 	border: 1px solid #d3d0cb;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
-	border-bottom: 1px solid black;
+	border-radius: 5px;
+	/*border-bottom: 1px solid black;*/
 	font-weight: bold;
 	user-select: none;
 	cursor: pointer;
@@ -24,7 +29,26 @@
 
 .tab {
 	min-height: 60vh;
-	border: 2px solid black;
+	border: 0px solid black;
 	width: 100%;
 	/* margin-top: 1em; */
+}
+.tab h2 {
+	display: block;
+	margin: 0 auto;
+}
+table {
+    border-top: 3px solid black;
+    border-collapse: collapse;
+    border-bottom: 1px solid black;
+    margin: auto;
+}
+th {
+	border-bottom: 1px solid black;
+    text-align: left;
+    padding-bottom: 0.3em;
+}
+td {
+	padding-right: 5em;
+	padding-bottom: 0.5em;
 }
