@@ -52,7 +52,9 @@ const whyFlavorText = [
     "jeg blev offended af det her",
     "jeg blev triggered af det her",
     "det her virker som fysiker-propaganda",
-    "ingen syntes det her var sjovt"
+    "ingen syntes det her var sjovt",
+    "Thea blev skræmt af en rus",
+    "en rus blev stødt og meldte dig til KU"
 ]
 function why(message, cmd){
     let userId = message.author.id;
