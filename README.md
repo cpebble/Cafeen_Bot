@@ -9,3 +9,5 @@ Requires secrets in the following format:
     "discord-client-secret": "<Client-secret>",
 }
 ```
+# LICENSE
+Do Whatever The Fuck You Want(TM)
