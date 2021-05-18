@@ -1,4 +1,5 @@
 const utils = require("./utils");
+const Discord = require("discord.js");
 const fs = require("fs")
 
 // Env vars
@@ -86,13 +87,38 @@ function generateScoreboard(){
     }
     return output;
 }
+function generatePrettyScoreboard(msg, cmd) {
+    let embed = new Discord.MessageEmbed();
+    embed.setColor("#fce303")
+        .setTitle("Cafeens Scoreboard")
+        .setURL("https://cafeen.cshare.dk/");
+    for (let emoji in scoreboard) {
+        var sortable = [];
+        for (let user in scoreboard[emoji]) {
+            sortable.push([user, scoreboard[emoji][user]]);
+        }
+        let scores = sortable.sort((a, b) => (b[1].score - a[1].score));
+        let field = {
+            "name": emoji,
+            "value": "",
+        };
+        let top = scores.slice(0, 3);
+        let length = 0;
+        for (let i = 0; i < top.length; i++)
+            length = Math.max(length, scores[i][1]["username"].length)
+        for (let i = 0; i < top.length; i++){
+            field.value += `${top[i][1]["score"]}: ` +
+                `${top[i][1]["username"]}\n`
+        }
+        embed.addFields(field);
+    }
+    return embed;
+}
 
 async function init(app, dc, config) {
     scoreboard = await utils.loadJsonFile("scoreboard");
     // Register command function
-    utils.registerCommandFun(app, "score", (msg,cmd)=>{
-        return generateScoreboard();
-    });
+    utils.registerCommandFun(app, "score", generatePrettyScoreboard);
     utils.registerCommandFun(app, "ratio", ratio);
     dc.on("message", message => {
         message.createReactionCollector(() => true, scoreboardCollectorOptions).on("collect", onReactScoreboard);

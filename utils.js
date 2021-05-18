@@ -26,6 +26,17 @@ function getMessageLink(message){
 
 }
 
+function leftPad(message, n, c) {
+  if (message.length < n)
+    return leftPad(c + message, n, c)
+  return message;
+}
+function rightPad(message, n, c) {
+  if (message.length < n)
+    return rightPad(message + c, n, c)
+  return message;
+}
+
 function timeSince(date) {
 
   var seconds = Math.floor((new Date() - date) / 1000);
@@ -59,5 +70,7 @@ module.exports = {
   "getRandomInt": getRandomInt,
   "registerCommandFun": registerCommandFun,
   "timeSince": timeSince,
-  "getMessageLink": getMessageLink
+  "getMessageLink": getMessageLink,
+  "leftPad": leftPad,
+  "rightPad": rightPad
 }
