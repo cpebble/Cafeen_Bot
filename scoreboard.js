@@ -143,7 +143,7 @@ function grant(msg, cmd){
     }
     else{
         console.log("adding");
-        let username = msg.member.nickname
+        let username = msg.mentions.members.first().nickname
         console.log(username)
         scoreboard[emoji][id] = {
             "username": username,
