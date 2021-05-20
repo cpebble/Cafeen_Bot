@@ -152,5 +152,5 @@ async function RegisterModules() {
     let jP = Jail.init(app, dc, config);
     let rP = Random.init(app, dc, config);
     // Load async
-    await Promise.all([sP, qP, jP]);
+    await Promise.all([sP, qP, jP, rP]);
 }

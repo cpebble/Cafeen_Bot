@@ -2,12 +2,6 @@ const utils = require("./utils");
 
 
 
-
-
-
-
-
-
 async function init(app, dc, config) {
     utils.registerCommandFun(app, "howlow", (msg, cmd)=>{
         let carg = cmd.split(" ");

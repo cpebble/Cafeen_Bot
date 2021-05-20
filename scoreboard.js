@@ -115,11 +115,47 @@ function generatePrettyScoreboard(msg, cmd) {
     return embed;
 }
 
+function grant(msg, cmd){
+    if(msg.author.id != "333007839637536771" && msg.author.id != "98033868837232640")
+        return "Only for påbøl and thea";
+    // Get which id
+    if(msg.mentions.users.size != 1)
+        return "Til hvem though?";
+    let user = msg.mentions.users.first();
+    let id = user.id;
+    // Now parse command arguments
+    let cmdargs = cmd.split(" ");
+    if (cmdargs.length != 4)
+        return "Oh no, you did an oopsie woopsie with arguments"
+    let emoji = cmdargs[2];
+    let score = parseInt(cmdargs[3]);
+    // Check those command args
+    if(!(emoji in scoreboard))
+        return "Unknown emoji"
+    if (isNaN(score))
+        return "Jeg aner ikke hvad du prøver på at give"
+    
+    if (id in scoreboard[emoji]){
+        scoreboard[emoji][id]["score"] += score;
+    }
+    else{
+        scoreboard[emoji][id] = {
+            "username": user.username,
+            "score": score
+        }
+    }
+
+
+    console.log(`granting: ${user.id}, ${emoji}, ${score}`);
+    return "Ok"
+}
+
 async function init(app, dc, config) {
     scoreboard = await utils.loadJsonFile("scoreboard");
     // Register command function
     utils.registerCommandFun(app, "score", generatePrettyScoreboard);
     utils.registerCommandFun(app, "ratio", ratio);
+    utils.registerCommandFun(app, "grant", grant);
     dc.on("message", message => {
         message.createReactionCollector(() => true, scoreboardCollectorOptions).on("collect", onReactScoreboard);
     });
