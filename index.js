@@ -141,6 +141,8 @@ utils.loadJsonFile("config").then(data => config = data)
 const Scoreboard = require("./scoreboard");
 const Quotes = require("./quotes");
 const Jail = require("./jail");
+const Dyrestalden = require("./dyrestalden")
+const Random = require("./random");
 
 // Async load func
 async function RegisterModules() {
@@ -148,6 +150,7 @@ async function RegisterModules() {
     let sP = Scoreboard.init(app, dc, config);
     let qP = Quotes.init(app, dc, config);
     let jP = Jail.init(app, dc, config);
+    let rP = Random.init(app, dc, config);
     // Load async
     await Promise.all([sP, qP, jP]);
 }
