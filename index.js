@@ -60,7 +60,8 @@ let app = {
     },
     "active_guild": "nyi",
     "express_app": express_app,
-    "io": io
+    "io": io,
+    "dc": dc
 }
 // This handles input from either cli or bot dm
 function handleCommand(msg, cmd) {

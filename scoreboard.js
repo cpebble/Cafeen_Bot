@@ -98,7 +98,7 @@ function generatePrettyScoreboard(msg, cmd) {
             sortable.push([user, scoreboard[emoji][user]]);
         }
         let scores = sortable.sort((a, b) => (b[1].score - a[1].score));
-        if(scores.length == 0){
+        if(scores == undefined || scores.length == 0){
             continue;
         }
         let field = {
@@ -142,8 +142,11 @@ function grant(msg, cmd){
         scoreboard[emoji][id]["score"] += score;
     }
     else{
+        console.log("adding");
+        let username = msg.member.nickname
+        console.log(username)
         scoreboard[emoji][id] = {
-            "username": user.username,
+            "username": username,
             "score": score
         }
     }
