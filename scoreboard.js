@@ -98,6 +98,9 @@ function generatePrettyScoreboard(msg, cmd) {
             sortable.push([user, scoreboard[emoji][user]]);
         }
         let scores = sortable.sort((a, b) => (b[1].score - a[1].score));
+        if(scores.length == 0){
+            continue;
+        }
         let field = {
             "name": emoji,
             "value": "",
