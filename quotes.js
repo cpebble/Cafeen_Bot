@@ -1,5 +1,7 @@
 const utils = require("./utils");
-const fs = require("fs")
+const fs = require("fs");
+const Discord = require("discord.js");
+const { genQuote } = require("./inspirational");
 // Global quote list
 let quotes;
 // Env vars
@@ -49,6 +51,17 @@ function saveQuotes(message, cmd){
     return "Jeg har skrevet mine noter ned"
 }
 
+function sendInspQuote(msg, cmd) {
+    let i = utils.getRandomInt(quotes.length);
+    let q = quotes[i];
+    genQuote(q[1], q[0])
+        .then((canvas) => {
+            const attachment = new Discord.MessageAttachment(canvas.toBuffer(), "smukt.png");
+            msg.channel.send("Her er din nye wallpaper", attachment);
+        });
+    return "";
+}
+
 // Read a random quote
 async function getRandomQuote(){
     let i = utils.getRandomInt(quotes.length);
@@ -63,6 +76,7 @@ async function init(app, dc, config){
     // Register command handler
     utils.registerCommandFun(app, "citat", quoteMsgFun);
     utils.registerCommandFun(app, "save_quotes", saveQuotes)
+    utils.registerCommandFun(app, "inspire", sendInspQuote);
 
     //
     dc.on("message", message=>{
