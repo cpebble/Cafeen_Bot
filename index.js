@@ -56,6 +56,16 @@ let app = {
         }),
         "uptime": ((msg, cmd)=>{
             return utils.timeSince(uptime);
+        }),
+        "webcam": ((msg, cmd) => {
+            msg.channel.send("Her ser lidt coronatomt ud", {
+                "files": [{
+                    "attachment": "https://www.cafeen.org/test.php",
+                    "name": `${Date.now()}`
+                }
+                ]
+            });
+            return "";
         })
     },
     "active_guild": "nyi",
