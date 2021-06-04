@@ -1,7 +1,7 @@
 const { getMessageLink } = require("./utils");
 const utils = require("./utils");
 const fs = require("fs")
-let jail = {};
+let jail = [];
 let collectorOptions = {time: 60*60*1000, max: 1};
 let collectors = [];
 let activeGuild = undefined;
@@ -54,7 +54,8 @@ const whyFlavorText = [
     "det her virker som fysiker-propaganda",
     "ingen syntes det her var sjovt",
     "Thea blev skræmt af en rus",
-    "en rus blev stødt og meldte dig til KU"
+    "en rus blev stødt og meldte dig til KU",
+    "Påbøl sagde noget dumt"
 ]
 function why(message, cmd){
     let userId = message.author.id;
