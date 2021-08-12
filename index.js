@@ -108,6 +108,7 @@ function exitHandler(options, exitCode) {
         Scoreboard.destroy(dc, config);
         Quotes.destroy(dc, config);
         Jail.destroy(dc, config);
+        Social.destroy(dc, config);
     }
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit) {
@@ -154,6 +155,7 @@ const Quotes = require("./quotes");
 const Jail = require("./jail");
 const Dyrestalden = require("./dyrestalden")
 const Random = require("./random");
+const Social = require("./social");
 
 // Async load func
 async function RegisterModules() {
@@ -162,6 +164,7 @@ async function RegisterModules() {
     let qP = Quotes.init(app, dc, config);
     let jP = Jail.init(app, dc, config);
     let rP = Random.init(app, dc, config);
+    let soP = Social.init(app, dc, config);
     // Load async
-    await Promise.all([sP, qP, jP, rP]);
+    await Promise.all([sP, qP, jP, rP, soP]);
 }
