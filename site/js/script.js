@@ -77,3 +77,4 @@ function handleScoreIncrease(scoreObj){
 socket.on("connect", ()=>{socket.emit("fetch_scores")});
 socket.on("scoreboard", drawScoreBoard);
 socket.on("score", handleScoreIncrease);
+socket.on("quotes", console.log);

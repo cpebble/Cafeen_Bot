@@ -80,8 +80,43 @@ async function init(app, dc, config){
     utils.registerCommandFun(app, "inspire", sendInspQuote);
 
     App = app;
-    app.io.on("fetch_quotes", (socket)=>{
-        socket.emit("quotes", quotes);
+    app.io.on("connection", (socket)=>{
+        socket.on("fetch_quotes", ()=>{
+            socket.emit("quotes", quotes);
+        });
+        socket.on("quote_change_text", (qObj)=>{
+            // qObj = {index: i, newText: str}
+            if (qObj["index"] == undefined ||
+                qObj["index"] < 0 ||
+                qObj["index"] >= quotes.length ||
+                qObj["newText"] == undefined){
+                console.log("Error in qObj: " + JSON.stringify(qObj))
+            } else{
+                let q = quotes[qObj["index"]];
+                q[1] = qObj["newText"];
+                quotes[qObj["index"]] = q;
+            }
+        });
+        socket.on("quote_change_author", (qObj)=>{
+            // qObj = {index: i, newAuthor: str}
+            if (qObj["index"] == undefined ||
+                qObj["index"] < 0 ||
+                qObj["index"] >= quotes.length ||
+                qObj["newAuthor"] == undefined){
+                console.log("Error in qObj: " + JSON.stringify(qObj))
+            } else{
+                let q = quotes[qObj["index"]];
+                q[0] = qObj["newAuthor"];
+                quotes[qObj["index"]] = q;
+            }
+        });
+        socket.on("quote_save", ()=>{
+            saveQuotes();
+        });
+        socket.on("quote_load", ()=>{
+            console.log("Tried to load quotes but not available");
+        })
+        
     });
 
 }
