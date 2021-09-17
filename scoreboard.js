@@ -169,8 +169,11 @@ async function init(app, dc, config) {
     // app.express_app.get("/", (req,res)=>{
     //     res.sendFile(__dirname + "/site/index.html")
     // });
-    app.io.on("fetch_scores", (socket)=>{
-        socket.emit("scoreboard", scoreboard)
+    app.io.on("connection", (socket)=>{
+        socket.on("fetch_scores", ()=>{
+            console.log("Scoreboard fetch requested");
+            socket.emit("scoreboard", scoreboard)
+        });
     });
     App = app;
 }
