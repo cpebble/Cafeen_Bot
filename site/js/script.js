@@ -74,25 +74,6 @@ function handleScoreIncrease(scoreObj){
     drawScoreBoard(ScoreboardCache);
 }
 
-function handleScoreIncrease_old(scoreObj) {
-    // Recieves Object { uid: "333007839637536771", emoji: "upyolo" }
-    // Get the correcct row
-    // let table = document.querySelectorAll(`table[data-emoji="${scoreObj.emoji}"] > tr`) // For shure hackish
-    // let rows = [...table].filter((el) => {
-    //     return el.dataset.userId == scoreObj.uid
-    // });
-    // if (rows.length == 0) {
-    //     // TODO: Handle
-    //     return;
-    // }
-    // let row = rows[0];
-    // let score = parseInt(row.dataset.score);
-    // let nscore = score + 1;
-    // row.dataset.score = nscore;
-
-    // row.childNodes[2].textContent = nscore;
-    // console.log(row);
-}
-
+socket.on("connection", (socket)=>{socket.emit("fetch_scores")});
 socket.on("scoreboard", drawScoreBoard);
 socket.on("score", handleScoreIncrease);

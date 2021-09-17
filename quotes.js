@@ -19,6 +19,7 @@ let months = [
     "November",
     "December"
 ]
+let App;
 
 // Registers a quote into the list
 async function registerQuote(quote, quotee){
@@ -78,17 +79,15 @@ async function init(app, dc, config){
     utils.registerCommandFun(app, "save_quotes", saveQuotes)
     utils.registerCommandFun(app, "inspire", sendInspQuote);
 
-    //
-    dc.on("message", message=>{
-        if (message.content.startsWith(config.command_char + "citat")){
-            // Message split into array
-        }
-    })
+    App = app;
+    app.io.on("fetch_quotes", (socket)=>{
+        socket.emit("quotes", quotes);
+    }
 
 }
 
 async function destroy(dc, config){
-    fs.writeFileSync("quotes.json", JSON.stringify(quotes));
+    let rand = saveQuotes();
 }
 
 module.exports = {
