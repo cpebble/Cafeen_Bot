@@ -82,7 +82,7 @@ async function init(app, dc, config){
     App = app;
     app.io.on("fetch_quotes", (socket)=>{
         socket.emit("quotes", quotes);
-    }
+    });
 
 }
 
