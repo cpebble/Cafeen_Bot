@@ -1,7 +1,9 @@
 const utils = require("./utils");
 
-let socialRole = "875062048533401680"
+let socialRole = "875062048533401680";
 let socialRoleObj = undefined;
+
+let movieRole = "894562803069911050";
 
 function handleSocialRole (msg, cmd){
     let user = msg.author.id;
@@ -19,10 +21,25 @@ function handleSocialRole (msg, cmd){
 
 }
 
+function handleSocialRole (msg, cmd){
+    let user = msg.author.id;
+    let member = msg.member;
+    let carr = cmd.split(" ");
+    if (carr[1] == "yes"){
+        member.roles.add(movieRole);
+        return "Dårlig film Ja-Tak";
+    } else if (carr[1] == "no"){
+        member.roles.remove(movieRole);
+        return "Så du har fået nok ~amazing~ film?";
+    }
+    return 'Please sig \"Yes\" eller "No"';
+
+}
+
 async function init(app, dc, config){
     //utils.registerCommandFun(app, "unlock_jail", unJailAll);
     //utils.registerCommandFun(app, "why", why);
-    utils.registerCommandFun(app, "socialrole", handleSocialRole);
+    utils.registerCommandFun(app, "movierole", handleSocialRole);
 
 }
 async function destroy(dc, config){
