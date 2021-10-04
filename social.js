@@ -21,7 +21,7 @@ function handleSocialRole (msg, cmd){
 
 }
 
-function handleSocialRole (msg, cmd){
+function handleMovieRole (msg, cmd){
     let user = msg.author.id;
     let member = msg.member;
     let carr = cmd.split(" ");
@@ -39,7 +39,8 @@ function handleSocialRole (msg, cmd){
 async function init(app, dc, config){
     //utils.registerCommandFun(app, "unlock_jail", unJailAll);
     //utils.registerCommandFun(app, "why", why);
-    utils.registerCommandFun(app, "movierole", handleSocialRole);
+    utils.registerCommandFun(app, "movierole", handleMovieRole);
+    utils.registerCommandFun(app, "socialrole", handleSocialRole);
 
 }
 async function destroy(dc, config){
