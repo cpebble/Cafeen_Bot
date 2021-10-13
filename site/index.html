@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Cafeen Scoreboard</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Cafeen Bot Site</title>
+    <!--<link rel="stylesheet" href="css/style.css"> -->
   </head>
   <body>
-    <h1>Denne side er ikke over-engineered</h1>
-    <div id="tabs_panel"></div>
-    <div id="scoreboard-container">
+    <h1>Denne side er til Caféens Bot</h1>
+    <ul>
+        <li><a href="/scoreboard.html">Scoreboard</a></li>
+        <li><a href="/quotes.html">Quotes</a></li>
+    </ul>
 
     </div>
-    <script src="socket.io/socket.io.js"></script>
-    <script src="js/gui.js"></script>
-    <script src="js/script.js"></script>
+<style>
+ul {
+    list-style-type: none;
+}
+a {
+    font-size: larger;
+    text-decoration: none;
+    color: black;
+}
+li {
+    margin-bottom: 1em;
+}
+
+</style>
   </body>
 </html>

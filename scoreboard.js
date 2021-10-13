@@ -91,7 +91,7 @@ function generatePrettyScoreboard(msg, cmd) {
     let embed = new Discord.MessageEmbed();
     embed.setColor("#fce303")
         .setTitle("Cafeens Scoreboard")
-        .setURL("https://cafeen.cshare.dk/");
+        .setURL("https://cafeen.cshare.dk/scoreboard.html");
     for (let emoji in scoreboard) {
         var sortable = [];
         for (let user in scoreboard[emoji]) {

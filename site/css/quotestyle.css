@@ -1,0 +1,47 @@
+body {
+    background-color: #1C110A;
+    color: white;
+}
+#content {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: #1C110A;
+    color: black;
+}
+
+#quote-container {
+    display: grid;
+    grid-template-columns: [qauthor] 10ch [qtext] 1fr [editbtn] 5ch;
+    /*grid-template-columns: auto;*/
+    width: 55%;
+    font-size: large;
+    background-color: #1C110A;
+}
+.quote-text {
+    padding-bottom: 1em;
+    grid-column-start: qtext;
+    min-height: 4em;
+    padding-top: 1.5em;
+    padding-left: 1ch;
+    background-color: #E9B44C;
+    user-select: none;
+}
+.quote-author {
+    grid-column-start: qauthor;
+    /*background-color: gray;*/
+    font-weight: 450;
+    padding-top: 0.5em;
+    padding-left: 1ch;
+    background-color: #E9B44C;
+    user-select: none;
+}
+.editing {
+    border: 5px solid #50A2A7;
+    border-radius: 5%;
+}
+
+.quote-text:nth-of-type(4n+0), .quote-author:nth-of-type(4n+3) {
+    background-color: #E4D6A7;
+}
+

@@ -95,6 +95,7 @@ async function init(app, dc, config){
                 let q = quotes[qObj["index"]];
                 q[1] = qObj["newText"];
                 quotes[qObj["index"]] = q;
+                console.log("New quote saved: " + JSON.stringify(q));
             }
         });
         socket.on("quote_change_author", (qObj)=>{
@@ -102,12 +103,13 @@ async function init(app, dc, config){
             if (qObj["index"] == undefined ||
                 qObj["index"] < 0 ||
                 qObj["index"] >= quotes.length ||
-                qObj["newAuthor"] == undefined){
+                qObj["newText"] == undefined){
                 console.log("Error in qObj: " + JSON.stringify(qObj))
             } else{
                 let q = quotes[qObj["index"]];
-                q[0] = qObj["newAuthor"];
+                q[0] = qObj["newText"];
                 quotes[qObj["index"]] = q;
+                console.log("New quote saved: " + JSON.stringify(q));
             }
         });
         socket.on("quote_save", ()=>{
