@@ -35,6 +35,7 @@ body {
     padding-left: 1ch;
     background-color: #E9B44C;
     user-select: none;
+    word-wrap: break-word;
 }
 .editing {
     border: 5px solid #50A2A7;
