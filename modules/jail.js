@@ -1,5 +1,5 @@
-const { getMessageLink } = require("./utils");
-const utils = require("./utils");
+const { getMessageLink } = require("../utils/utils");
+const utils = require("../utils/utils");
 const fs = require("fs")
 let jail = [];
 let collectorOptions = {time: 60*60*1000, max: 1};
@@ -127,7 +127,7 @@ function unJailAll(msg, cmd){
 
 async function init(app, dc, config){
     // load jail file
-    jail = await utils.loadJsonFile("jail");
+    jail = await utils.loadJsonFile("utils/jail");
     // Check for cleanups
     setInterval(jailCleanup, 5000);
     // init acG
@@ -172,6 +172,10 @@ async function destroy(dc, config){
     }
 }
 module.exports = {
+    "modInfo": {
+        "name": "Not-So-Horny Jail",
+        "info": "Originally made to :bonk: Rumle and Simba. Now mostly for hygge"
+    },
     "init": init,
     "destroy": destroy
 }

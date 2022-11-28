@@ -1,4 +1,4 @@
-const utils = require("./utils");
+const utils = require("../utils/utils");
 const Discord = require("discord.js");
 const fs = require("fs")
 
@@ -65,7 +65,7 @@ function ratio(msg, cmd) {
 }
 
 function saveScores(){
-    fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
+    fs.writeFileSync("../utils/scoreboard.json", JSON.stringify(scoreboard));
 }
 
 function generateScoreboard(){
@@ -87,6 +87,7 @@ function generateScoreboard(){
     }
     return output;
 }
+
 function generatePrettyScoreboard(msg, cmd) {
     let embed = new Discord.MessageEmbed();
     embed.setColor("#fce303")
@@ -157,7 +158,7 @@ function grant(msg, cmd){
 }
 
 async function init(app, dc, config) {
-    scoreboard = await utils.loadJsonFile("scoreboard");
+    scoreboard = await utils.loadJsonFile("utils/scoreboard");
     // Register command function
     utils.registerCommandFun(app, "score", generatePrettyScoreboard);
     utils.registerCommandFun(app, "ratio", ratio);
@@ -166,9 +167,6 @@ async function init(app, dc, config) {
         message.createReactionCollector(() => true, scoreboardCollectorOptions).on("collect", onReactScoreboard);
     });
 
-    // app.express_app.get("/", (req,res)=>{
-    //     res.sendFile(__dirname + "/site/index.html")
-    // });
     app.io.on("connection", (socket)=>{
         socket.on("fetch_scores", ()=>{
             console.log("Scoreboard fetch requested");
@@ -178,9 +176,14 @@ async function init(app, dc, config) {
     App = app;
 }
 async function destroy(dc, config){
-
-    fs.writeFileSync("scoreboard.json", JSON.stringify(scoreboard));
+    fs.writeFileSync("../utils/scoreboard.json", JSON.stringify(scoreboard));
 }
 
-
-module.exports = { "init": init, "destroy": destroy, "saveScores": saveScores, "generateScoreboard": generateScoreboard }
+module.exports = {
+    "modInfo": {
+        "name": "Scoreboard",
+        "info": "I'm making a list, checking it twice, figuring out who's :bonk: and who's :uwu:"
+    },
+    "init": init, 
+    "destroy": destroy, 
+}

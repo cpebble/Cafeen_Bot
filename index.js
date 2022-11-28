@@ -1,6 +1,5 @@
 // Libs
 const Discord = require("discord.js");
-const fs = require("fs");
 // Setup express baseline app
 const Express = require("express")
 const express_app = Express();
@@ -12,15 +11,9 @@ const { Server } = require("socket.io");
 const io = new Server(express_server);
 
 // Discord stuffs
-const readline = require("readline");
 const dc = new Discord.Client();
 const secrets = require("./secrets.json");
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    prompt: ">>"
-});
-const utils = require("./utils.js");
+const utils = require("./utils/utils.js");
 
 // Config init
 let config = undefined;
@@ -39,17 +32,25 @@ dc.on("message", message => {
         } catch (error) {
             console.log("Error:");
             console.warn(error);
+            message.channel.send(`An error occured: ${error}`);
         }
-    } else {
-        // I guess do nothing
     }
 });
 
 let app = {
+    // A set of baseline commands
     "commands": {
-        "save_scores": ((msg,cmd)=>{
-            Scoreboard.saveScores();
-            return "Save_scores started"
+        "loaded_modules": ((msg, cmd)=>{
+            res = ""
+            for (const mod of app.loaded_modules)
+                res += `# Module: [${mod.name}]\n${mod.info}\n`
+            return res
+        }),
+        "loaded_commands": ((msg,cmd)=>{
+            res = ""
+            for (const mod in app.commands)
+                res += `# Command: ${mod}\n`
+            return res
         }),
         "github": ((msg,cmd)=>{
             return "https://github.com/cpebble/cafeen_bot"
@@ -57,17 +58,8 @@ let app = {
         "uptime": ((msg, cmd)=>{
             return utils.timeSince(uptime);
         }),
-        "webcam": ((msg, cmd) => {
-            msg.channel.send("Her ser lidt coronatomt ud", {
-                "files": [{
-                    "attachment": "https://www.cafeen.org/test.php",
-                    "name": `${Date.now()}`
-                }
-                ]
-            });
-            return "";
-        })
     },
+    "loaded_modules": [],
     "active_guild": "nyi",
     "express_app": express_app,
     "io": io,
@@ -79,12 +71,10 @@ function handleCommand(msg, cmd) {
     // Switch statements are sooo 1987
     let cmdfun = app.commands[cmdArg[0]] 
     let response;
-    if (cmdfun != undefined)
-    {
+    if (cmdfun != undefined) {
         response = cmdfun(msg, cmd)
     }
-    else
-    {
+    else {
         response = "OwO you typed an oopsie woopsie";
     }
     return response;
@@ -93,22 +83,13 @@ function handleCommand(msg, cmd) {
 // Start the bot server
 console.log("Logging in with" + secrets["discord-api-token"]);
 dc.login(secrets["discord-api-token"]);
-// TODO: Fix
-rl.prompt();
-rl.on('line', (line) => {
-    let res = handleCommand(line.trim());
-    console.log(res);
-    rl.prompt();
-});
+
+
 // Exit cleanly
 function exitHandler(options, exitCode) {
     if (options.cleanup) {
         // Destroy modules
-        fs.writeFileSync("config.json", JSON.stringify(config));
-        Scoreboard.destroy(dc, config);
-        Quotes.destroy(dc, config);
-        Jail.destroy(dc, config);
-        Social.destroy(dc, config);
+        console.error("WARNING, Shutdown-handler not defined")
     }
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit) {
@@ -135,6 +116,7 @@ dc.once("ready", () => {
         console.log("Main init() reported done");
     })
 });
+
 // Startup webserver
 express_server.listen(3000, ()=>{
     "Web server loaded"
@@ -146,25 +128,61 @@ async function init() {
     await RegisterModules();
 }
 
+
 // Load conf before anything else
 utils.loadJsonFile("config").then(data => config = data)
 
 // Module loading
-const Scoreboard = require("./scoreboard");
-const Quotes = require("./quotes");
-const Jail = require("./jail");
-const Dyrestalden = require("./dyrestalden")
-const Random = require("./random");
-const Social = require("./social");
+/// Wraps a module file to add error-handling, 
+async function registerModule(modulePath, app, dc, config) {
+    try {
+        // Try reading module
+        const MOD = require(modulePath);
+        if (!("modInfo" in MOD)){
+            // Handle missing module Info
+            console.warn(`Module at ${modulePath} didn't supply a module info object`)
+            MOD.modInfo = {
+                "name": `[${modulePath}]`,
+                "info": "No info found"
+            }
+        }
+
+        // If loaded, create promise initializing our mod
+        let p = MOD.init(app, dc, config)
+        .then(()=>{
+            return app.loaded_modules.push({
+                "name": MOD.modInfo.name,
+                "info": MOD.modInfo.info,
+                "module": MOD,
+            });
+        })
+        .catch(err=>{
+            console.error(`An error occured in initializing module ${MOD.modInfo.name}`);
+            console.debug(err);
+            return false;
+        })
+        return p;
+    } catch (error) {
+        console.error(`An error occured in loading module at ${modulePath}`)
+        console.debug(error)
+        return new Promise((r,rj)=>{
+            r(false);
+        });
+    }
+}
 
 // Async load func
 async function RegisterModules() {
+    let promises = []
     // Gather promises
-    let sP = Scoreboard.init(app, dc, config);
-    let qP = Quotes.init(app, dc, config);
-    let jP = Jail.init(app, dc, config);
-    let rP = Random.init(app, dc, config);
-    let soP = Social.init(app, dc, config);
+    for (const modPath of config.installed_modules) {
+        promises.push(registerModule(modPath, app, dc, config));
+    }
+
     // Load async
-    await Promise.all([sP, qP, jP, rP, soP]);
+    await Promise.all(promises);
+    console.log("Loaded the following modules:");
+    for (const modJSON of app.loaded_modules){
+        console.log("\t" + modJSON.name)
+    }
 }

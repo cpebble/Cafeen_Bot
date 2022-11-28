@@ -1,7 +1,7 @@
-const utils = require("./utils");
 const fs = require("fs");
 const Discord = require("discord.js");
-const { genQuote } = require("./inspirational");
+const utils = require("../utils/utils");
+const { genQuote } = require("../utils/inspirational");
 // Global quote list
 let quotes;
 // Env vars
@@ -73,14 +73,14 @@ async function getRandomQuote(){
 
 async function init(app, dc, config){
     // Load quote file
-    quotes = await utils.loadJsonFile("quotes");
+    quotes = await utils.loadJsonFile("utils/quotes");
     // Register command handler
     utils.registerCommandFun(app, "citat", quoteMsgFun);
     utils.registerCommandFun(app, "save_quotes", saveQuotes)
     utils.registerCommandFun(app, "inspire", sendInspQuote);
 
     App = app;
-    app.io.on("connection", (socket)=>{
+    App.io.on("connection", (socket)=>{
         socket.on("fetch_quotes", ()=>{
             socket.emit("quotes", quotes);
         });
@@ -128,6 +128,10 @@ async function destroy(dc, config){
 }
 
 module.exports = {
+    "modInfo": {
+        "name": "Quotes",
+        "info": "Module for handling 'citat' commands"
+    },
     "init": init,
     "destroy": destroy,
 }
