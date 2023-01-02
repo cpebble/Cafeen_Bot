@@ -1,7 +1,7 @@
 {
-  "name": "Cafeen_bot",
-  "version": "0.0.1",
-  "description": "Discord bot to automatically jail horny rumles",
+  "name": "pebble-framework",
+  "version": "0.5.0",
+  "description": "Generic framework for easy spining up a bot on discord",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,7 +11,7 @@
     "url": "git+ssh://git@github.com/cpebble/horny_bot.git"
   },
   "author": "@cp#8080",
-  "license": "MIT",
+  "license": "GPL V3",
   "bugs": {
     "url": "https://github.com/cpebble/horny_bot/issues"
   },
@@ -21,6 +21,15 @@
     "canvas": "^2.8.0",
     "discord.js": "^12.5.1",
     "express": "^4.17.1",
-    "socket.io": "^4.1.1"
+    "pg": "^8.8.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.25.8",
+    "socket.io": "^4.1.1",
+    "sqlite3": "^5.1.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.14",
+    "@types/node": "^18.11.9",
+    "typescript": "^4.9.3"
   }
 }

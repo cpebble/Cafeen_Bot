@@ -1,9 +1,10 @@
+import {IApp} from "../IApp"
 // OBS: Only a template module file, to allow easy extension
-async function init (app, dc, config){
+async function init (app, config){
     // TODO: Run initialization config
 }
 
-async function destroy(dc, config){
+async function destroy(app, config){
     // TODO: Shut down gracefully 
 }
 
@@ -14,4 +15,13 @@ module.exports = {
     },
     "init": init, 
     "destroy": destroy,
+}
+
+export interface BotModule {
+    modInfo: {
+        name: string;
+        info: string;
+    };
+    init: ((app: IApp, config) => Promise<any>);
+    destroy: ((app: IApp, config) => Promise<any>);
 }

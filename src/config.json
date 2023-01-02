@@ -31,12 +31,16 @@
             "timeout": 10000
         }
     ],
+    "db_url": "sqlite::memory",
     "installed_modules": [
-        "./modules/scoreboard",
-        "./modules/quotes",
-        "./modules/jail",
-        "./modules/random",
-        "./modules/social"
+        "dbtest"
     ],
-    "command_char": "^"
+    "command_char": "^",
+    "ign": [
+        "scoreboard",
+        "quotes",
+        "jail",
+        "random",
+        "social"
+    ]
 }

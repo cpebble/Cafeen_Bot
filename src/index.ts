@@ -1,23 +1,40 @@
+// Import local config and secrets immediately
+import secrets from "./secrets.json";
+import config from "./config.json";
+// Then import local configs
+import utils from "./utils/utils.js";
+import {BotModule} from "./modules/interface.js"
+
 // Libs
-const Discord = require("discord.js");
+import {Client as DiscordClient} from "discord.js";
 // Setup express baseline app
-const Express = require("express")
+import Express from "express";
 const express_app = Express();
-const http = require("http");
+import http from "http";
 const express_server = http.createServer(express_app);
 express_app.use(Express.static("site"));
+
 // Setup socket.io baseline app
-const { Server } = require("socket.io");
-const io = new Server(express_server);
+import { Server as IOServer } from "socket.io";
+const io = new IOServer(express_server);
+
+// Setup sequelize
+import { Sequelize } from "sequelize"
+const db = new Sequelize(config.db_url);
+(async ()=>{
+    try{
+        await db.authenticate();
+        console.log("DB Has been successfully authenticated");
+        app.db = db;
+    } catch (err) {
+        console.error("Unable to connect to db. Falling back");
+        app.db = new Sequelize("sqlite::memory");
+        await db.close().catch()
+    }
+})
 
 // Discord stuffs
-const dc = new Discord.Client();
-const secrets = require("./secrets.json");
-const utils = require("./utils/utils.js");
-
-// Config init
-let config = undefined;
-let uptime = undefined;
+const dc = new DiscordClient();
 
 
 // Listeners
@@ -37,17 +54,19 @@ dc.on("message", message => {
     }
 });
 
-let app = {
+import {IApp} from "./IApp"
+import { time } from "console";
+let app: IApp = {
     // A set of baseline commands
     "commands": {
         "loaded_modules": ((msg, cmd)=>{
-            res = ""
+            let res = ""
             for (const mod of app.loaded_modules)
-                res += `# Module: [${mod.name}]\n${mod.info}\n`
+                res += `# Module: [${mod.modInfo.name}]\n${mod.modInfo.info}\n`
             return res
         }),
         "loaded_commands": ((msg,cmd)=>{
-            res = ""
+            let res = ""
             for (const mod in app.commands)
                 res += `# Command: ${mod}\n`
             return res
@@ -56,14 +75,16 @@ let app = {
             return "https://github.com/cpebble/cafeen_bot"
         }),
         "uptime": ((msg, cmd)=>{
-            return utils.timeSince(uptime);
+            return utils.timeSince(app.started);
         }),
     },
     "loaded_modules": [],
     "active_guild": "nyi",
     "express_app": express_app,
     "io": io,
-    "dc": dc
+    "dc": dc,
+    "db": db,
+    "started": Date.now()
 }
 // This handles input from either cli or bot dm
 function handleCommand(msg, cmd) {
@@ -80,16 +101,16 @@ function handleCommand(msg, cmd) {
     return response;
 }
 
-// Start the bot server
-console.log("Logging in with" + secrets["discord-api-token"]);
-dc.login(secrets["discord-api-token"]);
-
 
 // Exit cleanly
-function exitHandler(options, exitCode) {
+async function exitHandler(options, exitCode) {
     if (options.cleanup) {
         // Destroy modules
-        console.error("WARNING, Shutdown-handler not defined")
+        let queue: Promise<any>[] = [];
+        for (const mod of app.loaded_modules) {
+            queue.push(mod.destroy(app, config));
+        }
+        Promise.all(queue);
     }
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit) {
@@ -111,7 +132,10 @@ process.on('uncaughtException', exitHandler.bind(null, { exit: true }));
 // Startup binds
 dc.once("ready", () => {
     console.log("Discord ready");
-    dc.user.setActivity('Your conversations', { type: 'LISTENING' });
+    // Edge case where we haven't got a bot user connected
+    if (dc.user != null)
+        dc.user.setActivity('Your conversations', { type: 'LISTENING' });
+    // Finally init arrything
     init().then(() => {
         console.log("Main init() reported done");
     })
@@ -123,38 +147,24 @@ express_server.listen(3000, ()=>{
 });
 
 async function init() {
-    uptime = Date.now();
     // Load the config file
     await RegisterModules();
 }
 
 
-// Load conf before anything else
-utils.loadJsonFile("config").then(data => config = data)
-
 // Module loading
 /// Wraps a module file to add error-handling, 
-async function registerModule(modulePath, app, dc, config) {
+async function registerModule(modulePath, app, config): Promise<boolean> {
     try {
         // Try reading module
-        const MOD = require(modulePath);
-        if (!("modInfo" in MOD)){
-            // Handle missing module Info
-            console.warn(`Module at ${modulePath} didn't supply a module info object`)
-            MOD.modInfo = {
-                "name": `[${modulePath}]`,
-                "info": "No info found"
-            }
-        }
+        const MOD: BotModule = await import(modulePath + ".js");
 
         // If loaded, create promise initializing our mod
-        let p = MOD.init(app, dc, config)
+        let p = MOD.init(app, config)
         .then(()=>{
-            return app.loaded_modules.push({
-                "name": MOD.modInfo.name,
-                "info": MOD.modInfo.info,
-                "module": MOD,
-            });
+            return app.loaded_modules.push(
+                MOD
+            );
         })
         .catch(err=>{
             console.error(`An error occured in initializing module ${MOD.modInfo.name}`);
@@ -173,16 +183,24 @@ async function registerModule(modulePath, app, dc, config) {
 
 // Async load func
 async function RegisterModules() {
-    let promises = []
+    let promises: Promise<boolean>[] = []
     // Gather promises
     for (const modPath of config.installed_modules) {
-        promises.push(registerModule(modPath, app, dc, config));
+        promises.push(registerModule("./modules/"+modPath, app, config));
     }
 
     // Load async
     await Promise.all(promises);
     console.log("Loaded the following modules:");
-    for (const modJSON of app.loaded_modules){
-        console.log("\t" + modJSON.name)
+    for (const mod of app.loaded_modules){
+        console.log("\t" + mod.modInfo.name)
     }
 }
+
+
+// Start the bot server
+// Note, once dc calls back as 'ready' all other module loading etc. takes place
+// Thus called last
+console.log("Logging in with" + secrets["discord-api-token"]);
+dc.login(secrets["discord-api-token"]);
+
