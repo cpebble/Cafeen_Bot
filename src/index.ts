@@ -40,6 +40,8 @@ const dc: DiscordClient = new DiscordClient();
 // Listeners
 dc.on("message", (message: DC.Message) => {
     if (message.content.startsWith(config.command_char)) {
+        if (app.blacklist.includes(message.author))
+            return
         let cmd = message.content.substring(1)
         console.log(`Got command: ${cmd}`);
         try {
