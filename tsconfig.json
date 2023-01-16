@@ -4,7 +4,8 @@
         "allowJs": true,
         "target": "es2022",
         "module": "NodeNext",
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "sourceMap": true
     },
     "exclude": [
         "node_modules"

@@ -154,10 +154,13 @@ async function init() {
 
 // Module loading
 /// Wraps a module file to add error-handling, 
+declare function require(moduleName: string): any;
 async function registerModule(modulePath, app, config): Promise<boolean> {
     try {
         // Try reading module
-        const MOD: BotModule = await import(modulePath + ".js");
+        const MOD: BotModule = await import(modulePath + ".js").then(m => {
+            return new m(app, config)}
+            );
 
         // If loaded, create promise initializing our mod
         let p = MOD.init(app, config)

@@ -11,6 +11,7 @@ A module testing
 - TS Conversion of modules` };
     async init (app: IApp, config){
         // TODO: Run initialization config
+        return true
     }
 
     async destroy(app: IApp, config){
