@@ -7,6 +7,7 @@ import {BotModule} from "./modules/interface.js"
 
 // Libs
 import {Client as DiscordClient} from "discord.js";
+import * as DC from "discord.js"
 // Setup express baseline app
 import Express from "express";
 const express_app = Express();
@@ -34,11 +35,10 @@ const db = new Sequelize(config.db_url);
 })
 
 // Discord stuffs
-const dc = new DiscordClient();
-
+const dc: DiscordClient = new DiscordClient();
 
 // Listeners
-dc.on("message", message => {
+dc.on("message", (message: DC.Message) => {
     if (message.content.startsWith(config.command_char)) {
         let cmd = message.content.substring(1)
         console.log(`Got command: ${cmd}`);
@@ -55,7 +55,6 @@ dc.on("message", message => {
 });
 
 import {IApp} from "./IApp"
-import { time } from "console";
 let app: IApp = {
     // A set of baseline commands
     "commands": {
@@ -77,6 +76,10 @@ let app: IApp = {
         "uptime": ((msg, cmd)=>{
             return utils.timeSince(app.started);
         }),
+        "optout": ((msg, cmd)=>{
+            app.blacklist.push(msg.author);
+            return "I will not consider further commands from you"
+        })
     },
     "loaded_modules": [],
     "active_guild": "nyi",
@@ -84,13 +87,15 @@ let app: IApp = {
     "io": io,
     "dc": dc,
     "db": db,
-    "started": Date.now()
+    "started": Date.now(),
+    "blacklist": []
 }
 // This handles input from either cli or bot dm
-function handleCommand(msg, cmd) {
+type BotCommand = ((msg: DC.Message, cmd: String) => (String | void))
+function handleCommand(msg: DC.Message, cmd: String) {
     let cmdArg = cmd.split(" ")
     // Switch statements are sooo 1987
-    let cmdfun = app.commands[cmdArg[0]] 
+    let cmdfun: BotCommand = app.commands[cmdArg[0]] 
     let response;
     if (cmdfun != undefined) {
         response = cmdfun(msg, cmd)
@@ -103,18 +108,21 @@ function handleCommand(msg, cmd) {
 
 
 // Exit cleanly
+let isProperlyCleared = false;
 async function exitHandler(options, exitCode) {
-    if (options.cleanup) {
+    if (options.cleanup && !isProperlyCleared) {
         // Destroy modules
         let queue: Promise<any>[] = [];
         for (const mod of app.loaded_modules) {
             queue.push(mod.destroy(app, config));
         }
-        Promise.all(queue);
+        await Promise.all(queue).then(()=>{
+            console.log("Exit cleanly");
+            isProperlyCleared = true;}
+        );
     }
-    if (exitCode || exitCode === 0) console.log(exitCode);
+    if (exitCode || exitCode != 0) console.log(exitCode);
     if (options.exit) {
-        console.log("Exit cleanly");
         process.exit();
     }
 }
@@ -154,12 +162,11 @@ async function init() {
 
 // Module loading
 /// Wraps a module file to add error-handling, 
-declare function require(moduleName: string): any;
 async function registerModule(modulePath, app, config): Promise<boolean> {
     try {
         // Try reading module
         const MOD: BotModule = await import(modulePath + ".js").then(m => {
-            return new m(app, config)}
+             return new m.Module()}
             );
 
         // If loaded, create promise initializing our mod

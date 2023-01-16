@@ -1,14 +1,15 @@
 import {BotModule} from "./interface"
 import { IApp } from "../IApp";
 
-
-
-export class DBTest implements BotModule {
-    modInfo: { name: "DBTest",
+export class Module implements BotModule {
+    public modInfo = { name: "DBTest",
                info: `
 A module testing
 - DB Integration
 - TS Conversion of modules` };
+    constructor(){
+
+    }
     async init (app: IApp, config){
         // TODO: Run initialization config
         return true

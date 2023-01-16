@@ -129,3 +129,4 @@ secrets.json
 quote_images/
 build/
 backup.tar.gz
+.vscode/
