@@ -33,7 +33,8 @@
     ],
     "db_url": "sqlite::memory",
     "installed_modules": [
-        "dbtest"
+        "dbtest",
+        "scanquotes"
     ],
     "command_char": "^",
     "ign": [
