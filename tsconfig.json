@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": "./src",
         "outDir": "./build",
         "rootDir": "./src",
         "allowJs": true,
@@ -9,7 +10,9 @@
         "resolveJsonModule": true,
         "sourceMap": true,
         "esModuleInterop": true,
-        "typeRoots": ["./node_modules/@types", "./node_modules/discord.js/typings"]
+        "typeRoots": ["./node_modules/@types", "./node_modules/discord.js/typings"],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "exclude": [
         "node_modules"
