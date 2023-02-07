@@ -1,4 +1,5 @@
 import config from "../config.json";
+import secrets from "../secrets.json"
 import * as SQ from "sequelize-typescript";
 
 export class DBM {
@@ -29,7 +30,7 @@ export class DBM {
     
     private async initConnection(){
         // Init DB Connection
-        this.sq = new SQ.Sequelize(config.db_url)
+        this.sq = new SQ.Sequelize(secrets.db_url)
         await this.sq.authenticate()
     }
 
@@ -56,6 +57,10 @@ class Quote extends SQ.Model<Quote> {
     declare Author: string;
     @SQ.Column(SQ.DataType.TEXT)
     declare Text: string;
+    @SQ.AllowNull(false)
+    @SQ.Default(0)
+    @SQ.Column(SQ.DataType.INTEGER)
+    declare Votes: Number;
     @SQ.Column
     declare Snowflake?: string;
 }
@@ -64,7 +69,7 @@ class Quote extends SQ.Model<Quote> {
     let t = await DBM.getInstance();
     await t.addModel(Quote);
     console.log("Added Quote model");
-    await Quote.sync();
+    await Quote.sync({alter: true});
     console.log("Synced");
 
     let p = new Quote({Author: "Pebble", Text: "Fuack"});
@@ -75,4 +80,8 @@ class Quote extends SQ.Model<Quote> {
     console.log(p_[0].Author)
     // console.log(`${p_.id}: ${p_.Author}`);
     
-})()
+})().then(()=>{
+    console.log("Done")
+}).catch((err)=>{
+    console.warn(err)
+})

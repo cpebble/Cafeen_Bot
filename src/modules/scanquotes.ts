@@ -1,16 +1,17 @@
 import { BotModule } from "./interface";
-import { IApp} from "../IApp";
-import  * as DC  from "discord.js";
+import { IApp } from "../IApp";
+import * as DC from "discord.js";
 import utils from "../utils/utils";
 import { open, writeFile } from "fs/promises";
 import { writeFileSync } from "fs";
 
-async function main(msg: DC.Message, cmd){
+async function main(msg: DC.Message, cmd) {
     let qArr = msg.content.split(" ");
     let earliest = '817487078974554163';
     try {
         console.log(earliest)
-        let c: DC.TextChannel = await msg.client.channels.fetch(qArr[1])
+        let c: DC.TextChannel = 
+            await <Promise<DC.TextChannel>>msg.client.channels.fetch(qArr[1])
         let running = true;
         let foundQuotes = []
         let i = 0;
@@ -23,20 +24,20 @@ async function main(msg: DC.Message, cmd){
             let batch = await c.messages.fetch({
                 after: earliest,
             });
-            if (batch.size == 0){
+            if (batch.size == 0) {
                 console.log("No more batches");
                 running = false;
             } else {
                 for (const pair of batch) {
-                    if (parseInt(pair[0]) > parseInt(earliest)){
+                    if (parseInt(pair[0]) > parseInt(earliest)) {
                         earliest = pair[0];
-                    } else if (pair[0] == earliest){
+                    } else if (pair[0] == earliest) {
                         console.log("Completed")
                         running = false;
                         break;
                     }
                     let v = pair[1];
-                    if (!(v.content.split(" ").length > 2 
+                    if (!(v.content.split(" ").length > 2
                         && v.content.startsWith("$citat"))) continue;
                     let qA = v.content.split(" ");
                     let quotee = qA[1];
@@ -61,10 +62,11 @@ async function main(msg: DC.Message, cmd){
 export class Module implements BotModule {
     public modInfo = {
         name: "Scan Quotes Module",
-        info: "Simple lol" };
+        info: "Simple lol"
+    };
 
-    async init(app: IApp, config: any){
-        utils.registerCommandFun(app, "scan", (m,c)=>{main(m,c); return "Started"})
+    async init(app: IApp, config: any) {
+        utils.registerCommandFun(app, "scan", (m, c) => { main(m, c); return "Started" })
     }
-    async destroy(app: IApp, config: any){};
+    async destroy(app: IApp, config: any) { };
 }

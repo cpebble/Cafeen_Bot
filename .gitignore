@@ -130,3 +130,4 @@ quote_images/
 build/
 backup.tar.gz
 .vscode/
+postgresdata/
