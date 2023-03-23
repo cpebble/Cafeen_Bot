@@ -7,7 +7,7 @@
         "target": "es2022",
         "module": "NodeNext",
         "moduleResolution": "nodenext",
-        "resolveJsonModule": true,
+        "resolveJsonModule": false,
         "sourceMap": true,
         "esModuleInterop": true,
         "typeRoots": ["./node_modules/@types", "./node_modules/discord.js/typings"],

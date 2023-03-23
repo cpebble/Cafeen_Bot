@@ -1,8 +1,7 @@
 // Import local config and secrets immediately
-import secrets from "./secrets.json";
-import config from "./config.json";
+import {config, secrets} from "./config";
 // Then import local configs
-import utils from "./utils/utils.js";
+import utils from "./utils/utils";
 import {BotModule} from "./modules/interface.js"
 
 // Libs
@@ -18,21 +17,6 @@ express_app.use(Express.static("site"));
 // Setup socket.io baseline app
 import { Server as IOServer } from "socket.io";
 const io = new IOServer(express_server);
-
-// Setup sequelize
-import { Sequelize } from "sequelize"
-const db = new Sequelize(config.db_url);
-(async ()=>{
-    try{
-        await db.authenticate();
-        console.log("DB Has been successfully authenticated");
-        app.db = db;
-    } catch (err) {
-        console.error("Unable to connect to db. Falling back");
-        app.db = new Sequelize("sqlite::memory");
-        await db.close().catch()
-    }
-})
 
 // Discord stuffs
 const dc: DiscordClient = new DiscordClient();
@@ -88,7 +72,6 @@ let app: IApp = {
     "express_app": express_app,
     "io": io,
     "dc": dc,
-    "db": db,
     "started": Date.now(),
     "blacklist": []
 }
@@ -159,7 +142,7 @@ express_server.listen(3000, ()=>{
 async function init() {
     // Load the config file
     await RegisterModules();
-}
+}       
 
 
 // Module loading

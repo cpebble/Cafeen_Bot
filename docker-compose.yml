@@ -12,7 +12,8 @@ services:
       PGDATA: /pgdata 
     volumes: 
       - ./postgresdata:/pgdata:rw
-  adminer:
-    image: adminer
-    ports:
-      - "8080:8080"
+  cafbot:
+    image: cafbot:stable
+    build: .
+    environment:
+      db_url: "postgres://cafbot:qwertyhaskell@postgres:5432/cafbot"

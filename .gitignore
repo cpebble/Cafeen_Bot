@@ -131,3 +131,4 @@ build/
 backup.tar.gz
 .vscode/
 postgresdata/
+backupsecrets.json

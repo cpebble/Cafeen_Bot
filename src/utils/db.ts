@@ -1,6 +1,6 @@
-import config from "../config.json";
-import secrets from "../secrets.json"
+import {config, secrets} from "../config";
 import * as SQ from "sequelize-typescript";
+import utils from "./utils";
 
 export class DBM {
     // Singleton
@@ -30,7 +30,11 @@ export class DBM {
     
     private async initConnection(){
         // Init DB Connection
-        this.sq = new SQ.Sequelize(secrets.db_url)
+        utils.dbLog(secrets.db_url);
+        this.sq = new SQ.Sequelize(secrets.db_url, {
+            logging: false,
+            dialect:"postgres"
+        })
         await this.sq.authenticate()
     }
 
@@ -65,23 +69,23 @@ class Quote extends SQ.Model<Quote> {
     declare Snowflake?: string;
 }
 
-(async ()=>{
-    let t = await DBM.getInstance();
-    await t.addModel(Quote);
-    console.log("Added Quote model");
-    await Quote.sync({alter: true});
-    console.log("Synced");
+// (async ()=>{
+//     let t = await DBM.getInstance();
+//     await t.addModel(Quote);
+//     console.log("Added Quote model");
+//     await Quote.sync({alter: true});
+//     console.log("Synced");
 
-    let p = new Quote({Author: "Pebble", Text: "Fuack"});
-    await p.save();
-    console.log("Saved");
+//     let p = new Quote({Author: "Pebble", Text: "Fuack"});
+//     await p.save();
+//     console.log("Saved");
 
-    let p_ = await Quote.findAll();
-    console.log(p_[0].Author)
-    // console.log(`${p_.id}: ${p_.Author}`);
+//     let p_ = await Quote.findAll();
+//     console.log(p_[0].Author)
+//     // console.log(`${p_.id}: ${p_.Author}`);
     
-})().then(()=>{
-    console.log("Done")
-}).catch((err)=>{
-    console.warn(err)
-})
+// })().then(()=>{
+//     console.log("Done")
+// }).catch((err)=>{
+//     console.warn(err)
+// })

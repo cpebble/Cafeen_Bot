@@ -4,6 +4,7 @@ import * as DC from "discord.js";
 import utils from "../utils/utils";
 import { open, writeFile } from "fs/promises";
 import { writeFileSync } from "fs";
+import { Quote } from "./quotes";
 
 async function main(msg: DC.Message, cmd) {
     let qArr = msg.content.split(" ");
@@ -42,13 +43,17 @@ async function main(msg: DC.Message, cmd) {
                     let qA = v.content.split(" ");
                     let quotee = qA[1];
                     let quote = qA.splice(2).join(" ");
-                    foundQuotes.push([quotee, quote, pair[0]]);
+                    foundQuotes.push([quotee, quote, v.id]);
                 }
                 console.log(`Processed ${i} batch of size ${batch.size}. Quotes: ${foundQuotes.length}, earliest: ${earliest}`);
             }
         }
 
         writeFileSync("collected.json", JSON.stringify(foundQuotes));
+        foundQuotes.forEach((q => {
+            let qm = new Quote({Snowflake: q[2], Author: q[0], Text: q[1]});
+            qm.save();
+        }))
     } catch (error) {
         console.log(error)
     }

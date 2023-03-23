@@ -14,7 +14,6 @@ export interface IApp {
     blacklist: User[];
     io: Server;
     dc: Client;
-    db: Sequelize;
     started: Number;
 
 }
