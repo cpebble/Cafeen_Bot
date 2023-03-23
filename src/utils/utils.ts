@@ -1,11 +1,19 @@
 const fs = require("fs").promises;
+import {config} from "../config"
+import console from "console";
+
 async function loadJsonFile(filename) {
   const data = await fs.readFile(`${filename}.json`)
-  ret = JSON.parse(data);
+  let ret = JSON.parse(data);
   console.log(`Loaded ${filename} File`);
   return ret;
 }
 
+function dbLog(obj){
+  if (config.debug){
+    console.log(obj)
+  }
+}
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -38,8 +46,7 @@ function rightPad(message, n, c) {
 }
 
 function timeSince(date) {
-
-  var seconds = Math.floor((new Date() - date) / 1000);
+  var seconds = Math.floor(((Date.now()) - date) / 1000);
 
   var interval = seconds / 31536000;
 
@@ -65,12 +72,13 @@ function timeSince(date) {
   return Math.floor(seconds) + " seconds";
 }
 
-module.exports = {
-  "loadJsonFile": loadJsonFile,
-  "getRandomInt": getRandomInt,
-  "registerCommandFun": registerCommandFun,
-  "timeSince": timeSince,
-  "getMessageLink": getMessageLink,
-  "leftPad": leftPad,
-  "rightPad": rightPad
+export default {
+  loadJsonFile,
+  getRandomInt,
+  registerCommandFun,
+  timeSince,
+  getMessageLink,
+  leftPad,
+  rightPad,
+  dbLog
 }

@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "outDir": "./build",
+        "rootDir": "./src",
+        "allowJs": true,
+        "target": "es2022",
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
+        "resolveJsonModule": false,
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "typeRoots": ["./node_modules/@types", "./node_modules/discord.js/typings"],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "include": ["./src/**/*"]
+}

@@ -10,4 +10,4 @@ Requires secrets in the following format:
 }
 ```
 # LICENSE
-Do Whatever The Fuck You Want(TM)
+GPL 3 as of vs 0.9

@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:bullseye
+    ports: 
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: "root"
+      POSTGRES_DB: postgres
+      PGDATA: /pgdata 
+    volumes: 
+      - ./postgresdata:/pgdata:rw
+  cafbot:
+    image: cafbot:stable
+    build: .
+    environment:
+      db_url: "postgres://cafbot:qwertyhaskell@postgres:5432/cafbot"

@@ -1,5 +1,5 @@
 import json
-with open("secrets.json") as s:
+with open("src/secrets.json") as s:
     config = json.load(s)
     clId = config["discord-client-id"]
     perms = config["discord-permissions-integer"]

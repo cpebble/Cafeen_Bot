@@ -1,0 +1,16 @@
+{
+    "roles": [],
+    "debug": false,
+    "installed_modules": [
+        "scanquotes",
+        "quotes"
+    ],
+    "command_char": "^",
+    "ign": [
+        "scoreboard",
+        "quotes",
+        "jail",
+        "random",
+        "social"
+    ]
+}

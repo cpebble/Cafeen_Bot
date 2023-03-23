@@ -127,3 +127,8 @@ dist
 # End of https://www.toptal.com/developers/gitignore/api/node,vscode
 secrets.json
 quote_images/
+build/
+backup.tar.gz
+.vscode/
+postgresdata/
+backupsecrets.json
