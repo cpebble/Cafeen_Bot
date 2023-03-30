@@ -52,14 +52,15 @@ async function registerQuote(quote: string, quotee: string, snowflake: string){
 }
 
 const quoteFlavorTexts = [
-    "Kan i huske dengang ",
-    "Alle grinte da ",
-    "Jeg var lige ved at tage hjem, indtil ",
-    "Var det ikke herre fedt da ",
-    "Ingen ved hvad der gik igennem deres hovede da ",
-    "Den bedste dag i mit liv, var da ",
-    "Gæt en promille da ",
-    "De var ikke engang fulde da "
+    "Kan i huske dengang {author} sagde {quote}",
+    "Alle grinte da {author} sagde {quote}",
+    "Jeg var lige ved at tage hjem, indtil {author} sagde {quote}",
+    "Var det ikke herre fedt da {author} sagde {quote}",
+    "Ingen ved hvad der gik igennem deres hovede da {author} sagde {quote}",
+    "Den bedste dag i mit liv, var da {author} sagde {quote}",
+    "Gæt en promille da {author} sagde {quote}",
+    "De var ikke engang fulde da {author} sagde {quote}",
+    "{author} var sikkert helt væk da de sagde {quote}"
 ]
 
 function quoteMsgFun(message: Discord.Message, cmd){
@@ -79,7 +80,7 @@ function quoteMsgFun(message: Discord.Message, cmd){
         let fl = quoteFlavorTexts[utils.getRandomInt(quoteFlavorTexts.length)];
         getRandomQuote()
         .then(quote=>{
-            message.channel.send(`${fl}${quote.Author} sagde "${quote.Text}"`)
+            message.channel.send(fl.replace("{author}", quote.Author).replace("{quote}", quote.Text))
         })
         .catch((err)=>{
             console.warn(err);
